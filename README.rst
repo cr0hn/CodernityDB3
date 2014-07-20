@@ -9,14 +9,14 @@ CodernityDB is opensource, pure python (no 3rd party dependency), fast (really f
 **Although this port is a beta** yet, it works in the basic usage cases.
 
 Calling for help
-===
+================
 
 Any help to port CodernityDB to Python 3 is wellcome. It's a hard works. 
 
 Feel free to clone the repo an send any patch.
 
 Status
-===
+======
 
 Following the official examples, I was able to determinate:
 
@@ -28,12 +28,12 @@ Following the official examples, I was able to determinate:
 
 
 Ported examples
-===
+===============
 
 There he ported examples:
 
 Insert/Save
----
+-----------
 
 ```python
 
@@ -52,7 +52,7 @@ main()
 
 
 Get query
----
+---------
 
 ```python
 
@@ -96,7 +96,7 @@ if __name__ == '__main__':
     
 
 Duplicates
----
+----------
 
 ```python
 
@@ -145,7 +145,7 @@ if __name__ == '__main__':
     
     
 Update/delete
----
+-------------
 
 ```python
 
@@ -207,7 +207,7 @@ if __name__ == '__main__':
 ```
 
 Ordered
----
+-------
 
 ```python
 
