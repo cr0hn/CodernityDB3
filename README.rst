@@ -1,6 +1,5 @@
-
-
-# This repository
+This repository
+===
 
 
 This is an intent **to port CodernityDB to Python 3**, from de [original source](http://labs.codernity.com/codernitydb), written for Python 2.x, 
@@ -9,28 +8,32 @@ CodernityDB is opensource, pure python (no 3rd party dependency), fast (really f
 
 **Although this port is a beta** yet, it works in the basic usage cases.
 
-# Calling for help
+Calling for help
+===
 
 Any help to port CodernityDB to Python 3 is wellcome. It's a hard works. 
 
 Feel free to clone the repo an send any patch.
 
-# Status
+Status
+===
 
 Following the official examples, I was able to determinate:
 
- - Insert/Save: Works oks!
- - Get query: Works oks!
- - Duplicates: Works oks!
- - Update/delete: Doesn't works yet.
- - Ordered data: Doesn't works yet.
+- Insert/Save: Works oks!
+- Get query: Works oks!
+- Duplicates: Works oks!
+- Update/delete: Doesn't works yet.
+- Ordered data: Doesn't works yet.
 
 
-# Ported examples
+Ported examples
+===
 
 There he ported examples:
 
-## Insert/Save
+Insert/Save
+---
 
 ```python
 
@@ -44,10 +47,12 @@ def main():
     for curr in db.all('id'):
         print(curr)
 
-main()```
+main()
+```
 
 
-## Get query
+Get query
+---
 
 ```python
 
@@ -86,10 +91,12 @@ def main():
     print(db.get('x', 10, with_doc=True))        
 
 if __name__ == '__main__':
-    main()```
+    main()
+```
     
 
-## Duplicates
+Duplicates
+---
 
 ```python
 
@@ -133,10 +140,12 @@ def main():
         print(curr)
 
 if __name__ == '__main__':
-    main()```
+    main()
+```
     
     
-## Update/delete
+Update/delete
+---
 
 ```python
 
@@ -194,9 +203,11 @@ def main():
         print(curr)
 
 if __name__ == '__main__':
-    main()```
+    main()
+```
 
-## Ordered
+Ordered
+---
 
 ```python
 
@@ -240,4 +251,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()```
+    main()
+```
