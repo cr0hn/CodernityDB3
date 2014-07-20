@@ -37,15 +37,15 @@ with open('README') as f:
 
 keywords = ' '.join(('database', 'python', 'nosql', 'key-value', 'key/value', 'db'))
 
-setup(name='CodernityDB',
+setup(name='CodernityDB3',
       version=__version__,
-      description="Pure python, fast, schema-less, NoSQL database",
+      description="Python 3 port of pure python, fast, schema-less, NoSQL database",
       long_description=L_DESCR,
       keywords=keywords,
-      author='Codernity',
-      author_email='contact@codernity.com',
+      author='cr0hn',
+      author_email='cr0hn@cr0hn.com',
       url='http://labs.codernity.com/codernitydb',
-      packages=['CodernityDB'],
+      packages=['CodernityDB3'],
       platforms='any',
       license=__license__,
       classifiers=[
