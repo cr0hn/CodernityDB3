@@ -35,221 +35,219 @@ There he ported examples:
 Insert/Save
 -----------
 
-```python
+.. code-block:: python
 
-from CodernityDB3.database import Database
+    from CodernityDB3.database import Database
 
-def main():
-    db = Database('/tmp/tut1')
-    db.create()
-    for x in range(100):
-        print(db.insert(dict(x=x)))
-    for curr in db.all('id'):
-        print(curr)
+    def main():
+        db = Database('/tmp/tut1')
+        db.create()
+        for x in range(100):
+            print(db.insert(dict(x=x)))
+        for curr in db.all('id'):
+            print(curr)
 
-main()
-```
+    main()
 
 
 Get query
 ---------
 
-```python
+.. code-block:: python
 
-from CodernityDB3.database import Database
-from CodernityDB3.hash_index import HashIndex
-
-
-class WithXIndex(HashIndex):
-
-    def __init__(self, *args, **kwargs):
-        kwargs['key_format'] = 'I'
-        super(WithXIndex, self).__init__(*args, **kwargs)
-
-    def make_key_value(self, data):
-        a_val = data.get("x")
-        if a_val is not None:
-            return a_val, None
-        return None
-
-    def make_key(self, key):
-        return key
+    from CodernityDB3.database import Database
+    from CodernityDB3.hash_index import HashIndex
 
 
-def main():
-    db = Database('/tmp/tut2')
-    db.create()
-    x_ind = WithXIndex(db.path, 'x')
-    db.add_index(x_ind)
+    class WithXIndex(HashIndex):
 
-    for x in range(100):
-        db.insert(dict(x=x))
+        def __init__(self, *args, **kwargs):
+            kwargs['key_format'] = 'I'
+            super(WithXIndex, self).__init__(*args, **kwargs)
 
-    for y in range(100):
-        db.insert(dict(y=y))
+        def make_key_value(self, data):
+            a_val = data.get("x")
+            if a_val is not None:
+                return a_val, None
+            return None
 
-    print(db.get('x', 10, with_doc=True))        
+        def make_key(self, key):
+            return key
 
-if __name__ == '__main__':
-    main()
-```
+
+    def main():
+        db = Database('/tmp/tut2')
+        db.create()
+        x_ind = WithXIndex(db.path, 'x')
+        db.add_index(x_ind)
+
+        for x in range(100):
+            db.insert(dict(x=x))
+
+        for y in range(100):
+            db.insert(dict(y=y))
+
+        print(db.get('x', 10, with_doc=True))        
+
+    if __name__ == '__main__':
+        main()
     
 
 Duplicates
 ----------
 
-```python
+.. code-block:: python
 
-from CodernityDB3.database import Database
-from CodernityDB3.hash_index import HashIndex
-
-
-class WithXIndex(HashIndex):
-
-    def __init__(self, *args, **kwargs):
-        kwargs['key_format'] = 'I'
-        super(WithXIndex, self).__init__(*args, **kwargs)
-
-    def make_key_value(self, data):
-        a_val = data.get("x")
-        if a_val is not None:
-            return a_val, None
-        return None
-
-    def make_key(self, key):
-        return key
+    from CodernityDB3.database import Database
+    from CodernityDB3.hash_index import HashIndex
 
 
-def main():
-    db = Database('/tmp/tut3')
-    db.create()
-    x_ind = WithXIndex(db.path, 'x')
-    db.add_index(x_ind)
+    class WithXIndex(HashIndex):
 
-    for x in range(100):
-        db.insert(dict(x=x))
+        def __init__(self, *args, **kwargs):
+            kwargs['key_format'] = 'I'
+            super(WithXIndex, self).__init__(*args, **kwargs)
 
-    for x in range(100):
-        db.insert(dict(x=x))
+        def make_key_value(self, data):
+            a_val = data.get("x")
+            if a_val is not None:
+                return a_val, None
+            return None
 
-    for y in range(100):
-        db.insert(dict(y=y))
+        def make_key(self, key):
+            return key
 
-    print(db.get('x', 10, with_doc=True))
-    for curr in db.get_many('x', 10, limit=-1, with_doc=True):
-        print(curr)
 
-if __name__ == '__main__':
-    main()
-```
+    def main():
+        db = Database('/tmp/tut3')
+        db.create()
+        x_ind = WithXIndex(db.path, 'x')
+        db.add_index(x_ind)
+
+        for x in range(100):
+            db.insert(dict(x=x))
+
+        for x in range(100):
+            db.insert(dict(x=x))
+
+        for y in range(100):
+            db.insert(dict(y=y))
+
+        print(db.get('x', 10, with_doc=True))
+        for curr in db.get_many('x', 10, limit=-1, with_doc=True):
+            print(curr)
+
+    if __name__ == '__main__':
+        main()
+
     
     
 Update/delete
 -------------
 
-```python
+.. code-block:: python
 
-from CodernityDB3.database import Database
-from CodernityDB3.tree_index import TreeBasedIndex
-
-
-class WithXIndex(TreeBasedIndex):
-
-    def __init__(self, *args, **kwargs):
-        kwargs['node_capacity'] = 10
-        kwargs['key_format'] = 'I'
-        super(WithXIndex, self).__init__(*args, **kwargs)
-
-    def make_key_value(self, data):
-        t_val = data.get('x')
-        if t_val is not None:
-            return t_val, None
-        return None
-
-    def make_key(self, key):
-        return key
+    from CodernityDB3.database import Database
+    from CodernityDB3.tree_index import TreeBasedIndex
 
 
-def main():
-    db = Database('/tmp/tut_update')
-    db.create()
-    x_ind = WithXIndex(db.path, 'x')
-    db.add_index(x_ind)
+    class WithXIndex(TreeBasedIndex):
 
-    # full examples so we had to add first the data
-    # the same code as in previous step
+        def __init__(self, *args, **kwargs):
+            kwargs['node_capacity'] = 10
+            kwargs['key_format'] = 'I'
+            super(WithXIndex, self).__init__(*args, **kwargs)
 
-    for x in range(100):
-        db.insert(dict(x=x))
+        def make_key_value(self, data):
+            t_val = data.get('x')
+            if t_val is not None:
+                return t_val, None
+            return None
 
-    for y in range(100):
-        db.insert(dict(y=y))
+        def make_key(self, key):
+            return key
 
-    # end of insert part
 
-    print(db.count(db.all, 'x'))
+    def main():
+        db = Database('/tmp/tut_update')
+        db.create()
+        x_ind = WithXIndex(db.path, 'x')
+        db.add_index(x_ind)
 
-    for curr in db.all('x', with_doc=True):
-        doc = curr['doc']
-        if curr['key'] % 7 == 0:
-            db.delete(doc)
-        elif curr['key'] % 5 == 0:
-            doc['updated'] = True
-            db.update(doc)
+        # full examples so we had to add first the data
+        # the same code as in previous step
 
-    print(db.count(db.all, 'x'))
+        for x in range(100):
+            db.insert(dict(x=x))
 
-    for curr in db.all('x', with_doc=True):
-        print(curr)
+        for y in range(100):
+            db.insert(dict(y=y))
 
-if __name__ == '__main__':
-    main()
-```
+        # end of insert part
+
+        print(db.count(db.all, 'x'))
+
+        for curr in db.all('x', with_doc=True):
+            doc = curr['doc']
+            if curr['key'] % 7 == 0:
+                db.delete(doc)
+            elif curr['key'] % 5 == 0:
+                doc['updated'] = True
+                db.update(doc)
+
+        print(db.count(db.all, 'x'))
+
+        for curr in db.all('x', with_doc=True):
+            print(curr)
+
+    if __name__ == '__main__':
+        main()
+
 
 Ordered
 -------
 
-```python
+.. code-block:: python
 
-from CodernityDB3.database import Database
-from CodernityDB3.tree_index import TreeBasedIndex
-
-
-class WithXIndex(TreeBasedIndex):
-
-    def __init__(self, *args, **kwargs):
-        kwargs['node_capacity'] = 10
-        kwargs['key_format'] = 'I'
-        super(WithXXIndex, self).__init__(*args, **kwargs)
-
-    def make_key_value(self, data):
-        t_val = data.get('x')
-        if t_val is not None:
-            return t_val, data
-        return None
-
-    def make_key(self, key):
-        return key
+    from CodernityDB3.database import Database
+    from CodernityDB3.tree_index import TreeBasedIndex
 
 
-def main():
-    db = Database('/tmp/tut4')
-    db.create()
-    x_ind = WithXIndex(db.path, 'x')
-    db.add_index(x_ind)
+    class WithXIndex(TreeBasedIndex):
 
-    for x in range(11):
-        db.insert(dict(x=x))
+        def __init__(self, *args, **kwargs):
+            kwargs['node_capacity'] = 10
+            kwargs['key_format'] = 'I'
+            super(WithXXIndex, self).__init__(*args, **kwargs)
 
-    for y in range(11):
-        db.insert(dict(y=y))
+        def make_key_value(self, data):
+            t_val = data.get('x')
+            if t_val is not None:
+                return t_val, data
+            return None
 
-    print(db.get('x', 10, with_doc=True))
-
-    for curr in db.get_many('x', start=15, end=25, limit=-1, with_doc=True):
-        print(curr)
+        def make_key(self, key):
+            return key
 
 
-if __name__ == '__main__':
-    main()
-```
+    def main():
+        db = Database('/tmp/tut4')
+        db.create()
+        x_ind = WithXIndex(db.path, 'x')
+        db.add_index(x_ind)
+
+        for x in range(11):
+            db.insert(dict(x=x))
+
+        for y in range(11):
+            db.insert(dict(y=y))
+
+        print(db.get('x', 10, with_doc=True))
+
+        for curr in db.get_many('x', start=15, end=25, limit=-1, with_doc=True):
+            print(curr)
+
+
+    if __name__ == '__main__':
+        main()
+    
