@@ -25,7 +25,7 @@ import shutil
 from CodernityDB3.storage import IU_Storage, DummyStorage
 
 try:
-    from CodernityDB import __version__
+    from CodernityDB3 import __version__
 except ImportError:
     from .__init__ import __version__
 

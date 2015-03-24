@@ -68,7 +68,7 @@ class Parser(object):
                       'infix': (['self.infix'], []),
                       'suffix': (['self.suffix'], [])
                       }
-        self.handle_int_imports = {'infix': "from itertools import izip\n"}
+        self.handle_int_imports = {'infix': "\n"}
 
         self.funcs_with_body = {'fix_r':
                                 ("""    def fix_r(self,s,l):
@@ -115,7 +115,7 @@ class Parser(object):
             t = (s, )
             for y in xrange(0, x):
                 t += (s[y + 1:],)
-            o.update(set(''.join(x).rjust(f, '_').lower() for x in izip(*t)))
+            o.update(set(''.join(x).rjust(f, '_').lower() for x in zip(*t)))
         return o\n""", False)}
         self.none = ['None', 'none', 'null']
         self.props_assign = ['=', ':']
@@ -273,23 +273,30 @@ class Parser(object):
         self.custom_header = set()
 
         self.tokens = []
-        self.tokens_head = ['# %s\n' % self.name, 'class %s(' % self.name, '):\n', '    def __init__(self, *args, **kwargs):        ']
+        self.tokens_head = [
+            '# %s\n' % self.name,
+            'class %s(' % self.name, '):\n',
+            '    def __init__(self, *args, **kwargs):        ']
 
         for i in range(3):
-            tokenize.tokenize(self.readline(i), self.add(self.pre_tokens, i))
+            for tolkien in tokenize.generate_tokens(self.readline(i)):
+                t = tuple(tolkien)
+                self.add(self.pre_tokens, i)(*t)
             # tokenize treats some keyword not in the right way, thats why we
             # have to change some of them
             for nk, k in enumerate(self.pre_tokens[i]):
                 for na, a in enumerate(k):
                     if a[0] == token.NAME and a[1] in self.logic:
-                        self.pre_tokens[i][nk][
-                            na] = (token.OP, a[1], a[2], a[3], a[4])
+                        self.pre_tokens[i][nk][na] = (
+                            token.OP, a[1], a[2], a[3], a[4])
 
         for i in self.pre_tokens[1]:
             self.line_cons[1].append(self.check_colons(i, 1))
             self.check_adjacents(i, 1)
             if self.check_for_2nd_arg(i) == -1 and not self.is_one_arg_enough:
-                raise IndexCreatorValueException("No 2nd value to return (did u forget about ',None'?", self.cnt_line_nr(i[0][4], 1))
+                raise IndexCreatorValueException(
+                    "No 2nd value to return (did u forget about ',None'?",
+                    self.cnt_line_nr(i[0][4], 1))
             self.is_one_arg_enough = False
 
         for i in self.pre_tokens[2]:

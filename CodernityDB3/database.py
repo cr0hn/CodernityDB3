@@ -15,28 +15,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-bytes = str
-
 import os
 import io
 from inspect import getsource
 
 # for custom indexes
 from CodernityDB3.storage import Storage, IU_Storage
-from CodernityDB3.hash_index import (IU_UniqueHashIndex,
-                                    IU_HashIndex,
-                                    HashIndex,
-                                    UniqueHashIndex)
+from CodernityDB3.hash_index import (
+    HashIndex,
+    IU_UniqueHashIndex,
+    IU_HashIndex,
+    UniqueHashIndex)
 # normal imports
 
-from CodernityDB3.index import (ElemNotFound,
-                               DocIdNotFound,
-                               IndexException,
-                               Index,
-                               TryReindexException,
-                               ReindexException,
-                               IndexNotFoundException,
-                               IndexConflict)
+from CodernityDB3.index import (
+    ElemNotFound,
+    DocIdNotFound,
+    IndexException,
+    Index,
+    TryReindexException,
+    ReindexException,
+    IndexNotFoundException,
+    IndexConflict)
 
 from CodernityDB3.misc import NONE
 
@@ -262,7 +262,7 @@ class Database(object):
             if os.path.exists(ind_path_f):
                 os.rename(ind_path_f, ind_path_f + '_last')  # save last working index code
             with io.FileIO(ind_path_f, 'w') as f:
-                f.write(new_index)
+                f.write(bytes(new_index, 'utf-8'))
 
             ind_obj = self._read_index_single(p, ind_path + '.py')
 

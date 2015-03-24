@@ -24,14 +24,14 @@ def get_meta(inc, name):
     return eval(re.search(r'(?:%s)\s*=\s*(.*)' % name, inc).group(1))
 
 
-with open(os.path.join("CodernityDB", '__init__.py'), 'r') as _init:
+with open(os.path.join("CodernityDB3", '__init__.py'), 'r') as _init:
     _init_d = _init.read()
 
 __version__ = get_meta(_init_d, '__version__')
 __license__ = get_meta(_init_d, '__license__')
 
 
-with open('README') as f:
+with open('README.rst') as f:
     L_DESCR = f.read()
 
 
@@ -51,8 +51,8 @@ setup(name='CodernityDB3',
       classifiers=[
       "License :: OSI Approved :: Apache Software License",
       "Programming Language :: Python",
-      "Programming Language :: Python :: 2.6",
-      "Programming Language :: Python :: 2.7",
+      "Programming Language :: Python :: 3.2",
+      "Programming Language :: Python :: 3.4",
       "Operating System :: OS Independent",
       "Topic :: Internet",
       "Topic :: Database",
