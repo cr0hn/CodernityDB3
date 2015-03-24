@@ -187,14 +187,15 @@ class IU_TreeBasedIndex(Index):
             status = status.encode()
 
         nodes_stack, indexes = self._find_leaf_to_insert(key)
-        self._insert_new_record_into_leaf(nodes_stack.pop(),
-                                          key,
-                                          doc_id,
-                                          start,
-                                          size,
-                                          status,
-                                          nodes_stack,
-                                          indexes)
+        self._insert_new_record_into_leaf(
+            nodes_stack.pop(),
+            key,
+            doc_id,
+            start,
+            size,
+            status,
+            nodes_stack,
+            indexes)
 
         ## print("¿¿¿¿¿¿\n")  # TODO
         self._match_doc_id.delete(doc_id)
@@ -246,10 +247,14 @@ class IU_TreeBasedIndex(Index):
         Calculates position of key in buckets file
         """
         if flag == 'l':
-            return start + self.leaf_heading_size + key_index * self.single_leaf_record_size
+            return int(
+                start + self.leaf_heading_size +
+                key_index * self.single_leaf_record_size)
         elif flag == 'n':
 #            returns start position of flag before key[key_index]
-            return start + self.node_heading_size + key_index * (self.pointer_size + self.key_size)
+            return int(
+                start + self.node_heading_size +
+                key_index * (self.pointer_size + self.key_size))
 
     def _match_doc_id(self, doc_id, key, element_index, leaf_start, nr_of_elements):
         curr_key_index = element_index + 1
@@ -790,11 +795,14 @@ class IU_TreeBasedIndex(Index):
         else:  # must read all elems after new one, and rewrite them after new
             start = self._calculate_key_position(
                 leaf_start, new_record_position, 'l')
+            helper = self.single_leaf_record_size
             self.buckets.seek(start)
-            data = self.buckets.read(nr_of_records_to_rewrite *
-                                     self.single_leaf_record_size)
-            records_to_rewrite = struct.unpack('<' + nr_of_records_to_rewrite *
-                                               self.single_leaf_record_format, data)
+            data = self.buckets.read(
+                nr_of_records_to_rewrite *
+                self.single_leaf_record_size)
+            records_to_rewrite = struct.unpack(
+                '<' + nr_of_records_to_rewrite *
+                self.single_leaf_record_format, data)
             curr_index = 0
             records_to_rewrite = list(records_to_rewrite)
             for status in records_to_rewrite[4::5]:  # don't write back deleted records, deleting them from list
@@ -1916,9 +1924,13 @@ class IU_TreeBasedIndex(Index):
         ## print(self) # TODO
         k = self.make_key(key)
         ## print("K:" * 10, k) # TODO
+        if isinstance(k, str):
+            k = bytes(k, 'utf-8')
         return self._find_key(k)
 
     def get_many(self, key, limit=1, offset=0):
+        if isinstance(key, str):
+            key = bytes(key, 'utf-8')
         return self._find_key_many(self.make_key(key), limit, offset)
 
     def get_between(self, start, end, limit=1, offset=0, inclusive_start=True, inclusive_end=True):
@@ -2021,10 +2033,12 @@ class IU_TreeBasedIndex(Index):
         original_name = self.name
         # os.unlink(os.path.join(self.db_path, self.name + "_buck"))
         self.close_index()
-        shutil.move(os.path.join(compact_ind.db_path, compact_ind.
-                                 name + "_buck"), os.path.join(self.db_path, self.name + "_buck"))
-        shutil.move(os.path.join(compact_ind.db_path, compact_ind.
-                                 name + "_stor"), os.path.join(self.db_path, self.name + "_stor"))
+        shutil.move(os.path.join(
+            compact_ind.db_path, compact_ind.
+            name + "_buck"), os.path.join(self.db_path, self.name + "_buck"))
+        shutil.move(os.path.join(
+            compact_ind.db_path, compact_ind.
+            name + "_stor"), os.path.join(self.db_path, self.name + "_stor"))
         # self.name = original_name
         self.open_index()  # reload...
         self.name = original_name

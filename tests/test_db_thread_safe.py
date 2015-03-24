@@ -52,7 +52,7 @@ class Test_Threads(object):
         db.create()
         db.add_index(WithAIndex(db.path, 'with_a'))
         ths = []
-        for x in xrange(100):
+        for x in range(100):
             ths.append(Thread(target=db.insert, args=(dict(a=x),)))
         for th in ths:
             th.start()
@@ -91,7 +91,7 @@ class Test_Threads(object):
                 else:
                     return True
         ths = []
-        for x in xrange(threads_num):  # python threads... beware!!!
+        for x in range(threads_num):  # python threads... beware!!!
             ths.append(Thread(target=updater))
         for th in ths:
             th.start()

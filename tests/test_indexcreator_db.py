@@ -103,14 +103,15 @@ class TestMultiIndexCreatorWithInternalImports:
         make_key:
         fix_r(key,3)
         """
-        compare_for_multi_index(db, 's', s, 'a', ['abcd'], [("a", None),
-                                                            ("ab", "abcd"),
-                                                            ("abc", "abcd"),
-                                                            ("b", None),
-                                                            ("abcd", "abcd"),  # fix_r will trim it to 3 letters!
-                                                            ("bcd", "abcd"),
-                                                            ("abdc", None)
-                                                            ])
+        compare_for_multi_index(
+            db, 's', s, 'a', ['abcd'],
+            [("a", None),
+             ("ab", "abcd"),
+             ("abc", "abcd"),
+             ("b", None),
+             ("abcd", "abcd"),  # fix_r will trim it to 3 letters!
+             ("bcd", "abcd"),
+             ("abdc", None)])
 
         s2 = """
         name = s2
@@ -121,14 +122,15 @@ class TestMultiIndexCreatorWithInternalImports:
         make_key:
         fix_r(key,5)
         """
-        compare_for_multi_index(db, 's2', s2, 'a', ["abcd"], [("a", "abcd"),
-                                                              ("ab", "abcd"),
-                                                              ("abc", "abcd"),
-                                                              ("b", "abcd"),
-                                                              ("abcd", "abcd"),
-                                                              ("bcd", "abcd"),
-                                                              ("abdc", None)
-                                                              ])
+        compare_for_multi_index(
+            db, 's2', s2, 'a', ["abcd"],
+            [("a", "abcd"),
+             ("ab", "abcd"),
+             ("abc", "abcd"),
+             ("b", "abcd"),
+             ("abcd", "abcd"),
+             ("bcd", "abcd"),
+             ("abdc", None)])
 
     def test_more_than_one_func(self, db):
         s = """
@@ -141,11 +143,12 @@ class TestMultiIndexCreatorWithInternalImports:
         make_key:
         fix_r(key,3)
         """
-        compare_for_multi_index(db, 's', s, 'a', ['abcd'], [("a", None),
-                                                            ("ab", "abcd"),
-                                                            ("abc", "abcd"),
-                                                            ("b", None),
-                                                            ("abcd", "abcd"),  # fix_r will trim it to 3 letters!
-                                                            ("bcd", "abcd"),
-                                                            ("abdc", None)
-                                                            ])
+        compare_for_multi_index(
+            db, 's', s, 'a', ['abcd'],
+            [("a", None),
+             ("ab", "abcd"),
+             ("abc", "abcd"),
+             ("b", None),
+             ("abcd", "abcd"),  # fix_r will trim it to 3 letters!
+             ("bcd", "abcd"),
+             ("abdc", None)])

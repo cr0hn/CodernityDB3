@@ -407,27 +407,27 @@ class Database(object):
         with io.FileIO(os.path.join(self.path, '_indexes', name), 'r') as f:
             co = f.read()
             if code_switch == 'All':
-                return co
+                return str(co, 'utf-8')
 
             if code_switch == 'S':
                 try:
-                    ind = co.index('#SIMPLIFIED CODE')
+                    ind = co.index(b'#SIMPLIFIED CODE')
                 except ValueError:
-                    return " "
+                    return u" "
                 else:
                     s = co[ind:]
                     l = s.splitlines()[1:-2]
                     ll = [x[1:] for x in l]
-                    return '\n'.join(ll)
+                    return str(b'\n'.join(ll), 'utf-8')
             if code_switch == 'P':
                 try:
-                    ind = co.index('#SIMPLIFIED CODE')
+                    ind = co.index(b'#SIMPLIFIED CODE')
                 except ValueError:
-                    return co
+                    return str(co, 'utf-8')
                 else:
-                    return co[:ind]
+                    return str(co[:ind], 'utf-8')
 
-        return ""  # shouldn't happen
+        return u""  # shouldn't happen
 
     def __set_main_storage(self):
         """
@@ -929,8 +929,10 @@ you should check index code.""" % (index.name, ex), RuntimeWarning)
 
         :param index_name: index to get data from
         :param key: key to get
-        :param with_doc: if ``True`` data from **id** index will be included in output
-        :param with_storage: if ``True`` data from index storage will be included, otherwise just metadata.
+        :param with_doc: if ``True`` data from **id** index will be
+            included in output
+        :param with_storage: if ``True`` data from index storage will be
+            included, otherwise just metadata.
         """
         # if not self.indexes_names.has_key(index_name):
         #     raise DatabaseException, "Invalid index name"

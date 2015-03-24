@@ -149,7 +149,7 @@ class TreeIndexTests:
         else:
             fcts = (_insert,) * 20 + (_update,) * 10 + (_delete,) * 5
 
-        for i in xrange(operations):
+        for i in range(operations):
             f = random.choice(fcts)
             f()
 
@@ -415,7 +415,7 @@ class TreeIndexTests:
         db.create()
         database_step_by_step(db)
         key_values = range(10000)
-        for x in (random.choice(key_values) for x in xrange(10000)):
+        for x in (random.choice(key_values) for x in range(10000)):
             a = dict(a=x)
             db.insert(a)
             test = db.get('tree', a['a'])
@@ -430,7 +430,7 @@ class TreeIndexTests:
         db.create()
         database_step_by_step(db)
         key_values = range(5)
-        for x in (random.choice(key_values) for x in xrange(1000)):
+        for x in (random.choice(key_values) for x in range(1000)):
             a = dict(a=x)
             db.insert(a)
             test = db.get('tree', a['a'])
@@ -802,7 +802,7 @@ class TreeIndexTests:
         db.set_indexes([id, tree])
         db.create()
         inserted = []
-        for key in xrange(1000):
+        for key in range(1000):
             a = dict(a=key)
             db.insert(a)
             inserted.append(a)
@@ -813,7 +813,7 @@ class TreeIndexTests:
             db.delete(rec)
         inserted[250:750] = []
         assert db.count(db.all, 'tree') == len(inserted)
-        for key in xrange(250, 750):
+        for key in range(250, 750):
             a = dict(a=key)
             db.insert(a)
             inserted.append(a)
@@ -829,7 +829,7 @@ class TreeIndexTests:
         db.set_indexes([id, tree])
         db.create()
         inserted = []
-        for key in xrange(1000):
+        for key in range(1000):
             a = dict(a=key)
             db.insert(a)
             inserted.append(a)
@@ -853,7 +853,7 @@ class TreeIndexTests:
         db.set_indexes([id, tree])
         db.create()
         inserted = []
-        for key in xrange(500):
+        for key in range(500):
             a = dict(a=key)
             db.insert(a)
             inserted.append(a)
@@ -1367,7 +1367,7 @@ class TreeIndexTests:
         tree = SimpleTreeIndex(db.path, 'tree')
         db.set_indexes([id, tree])
         db.create()
-        for x in xrange(20):
+        for x in range(20):
             db.insert(dict(a=1))
         assert 20 == db.count(db.get_many, 'tree', 1, limit=-1)
         db.insert(dict(a=2))

@@ -218,9 +218,9 @@ class TreeMultiTest(MultiTreeBasedIndex):
         l = self.__l
         max_l = len(name)
         out = set()
-        for x in xrange(l - 1, max_l):
+        for x in range(l - 1, max_l):
             m = (name, )
-            for y in xrange(0, x):
+            for y in range(0, x):
                 m += (name[y + 1:],)
             out.update(set(''.join(x).rjust(
                 16, '_').lower() for x in zip(*m)))  # ignore import error
@@ -261,7 +261,7 @@ class DB_Tests:
         db.set_indexes([UniqueHashIndex(db.path, 'id')])
         db.create()
         l = []
-        for i in xrange(5):
+        for i in range(5):
             c = dict(i=i)
             db.insert(c)
             l.append(c)
@@ -271,7 +271,7 @@ class DB_Tests:
         db2 = self._db(os.path.join(str(tmpdir), 'db'))
         # db2.set_indexes([UniqueHashIndex(db.path, 'id')])
         db2.open()
-        for j in xrange(5):
+        for j in range(5):
             assert l[j] == db2.get('id', l[j]['_id'])
         db2.close()
 
@@ -279,7 +279,7 @@ class DB_Tests:
         db = self._db(os.path.join(str(tmpdir), 'db'))
         db.set_indexes([UniqueHashIndex(db.path, 'id')])
         db.create()
-        for i in xrange(5):
+        for i in range(5):
             db.insert(dict(i=i))
         db.destroy()
         db = self._db(os.path.join(str(tmpdir), 'db'))
@@ -406,7 +406,7 @@ class DB_Tests:
 
         fcts = (
             _insert,) * 20 + (_get,) * 10 + (_update,) * 10 + (_delete,) * 5
-        for i in xrange(operations):
+        for i in range(operations):
             f = random.choice(fcts)
             f()
 
@@ -419,7 +419,7 @@ class DB_Tests:
 
         fcts = (
             _insert,) * 20 + (_get,) * 10 + (_update,) * 10 + (_delete,) * 5
-        for i in xrange(operations):
+        for i in range(operations):
             f = random.choice(fcts)
             f()
 
@@ -758,13 +758,13 @@ class DB_Tests:
         db.set_indexes([ind_id])
         db.create()
         l = []
-        for i in xrange(10):
+        for i in range(10):
             c = dict(i=i)
             c.update(db.insert(c))
             l.append(c)
 
 #        with name
-        for i in xrange(10):
+        for i in range(10):
             curr = l[i]
             c = db.get("id", curr['_id'])
             c['update'] = True
@@ -778,7 +778,7 @@ class DB_Tests:
             assert c['i'] == j
 
 #        with instance
-        for i in xrange(10):
+        for i in range(10):
             curr = l[i]
             c = db.get("id", curr['_id'])
             c['update'] = True
@@ -793,7 +793,7 @@ class DB_Tests:
             assert c['i'] == j
 
  #        with different instance
-        for i in xrange(10):
+        for i in range(10):
             curr = l[i]
             c = db.get("id", curr['_id'])
             c['update'] = True
@@ -825,7 +825,7 @@ class DB_Tests:
         db.create()
 
         l = []
-        for i in xrange(100):
+        for i in range(100):
             c = dict(i=i)
             db.insert(c)
             l.append(c)
@@ -890,7 +890,7 @@ class DB_Tests:
     def test_add_new_index_update_before_reindex_new_value(self, tmpdir):
         db = self._db(os.path.join(str(tmpdir), 'db'))
         db.create()
-        for x in xrange(20):
+        for x in range(20):
             db.insert(dict(t=x, test=x))
         el = db.insert(dict(t=1, test=1))
         el['new_data'] = 'new'
@@ -903,7 +903,7 @@ class DB_Tests:
     def test_add_new_index_update_before_reindex_old_value(self, tmpdir):
         db = self._db(os.path.join(str(tmpdir), 'db'))
         db.create()
-        for x in xrange(20):
+        for x in range(20):
             db.insert(dict(t=x, test=x))
         el = db.insert(dict(t=1, test=1))
         el['new_data'] = 'new'
@@ -915,7 +915,7 @@ class DB_Tests:
     def test_add_new_index_delete_before_reindex(self, tmpdir):
         db = self._db(os.path.join(str(tmpdir), 'db'))
         db.create()
-        for x in xrange(20):
+        for x in range(20):
             db.insert(dict(t=x, a=x))
         el = db.insert(dict(t=1, a=1))
 #        el['new_data']='new'
@@ -927,7 +927,7 @@ class DB_Tests:
         db = self._db(os.path.join(str(tmpdir), 'db'))
         db.create()
         db.add_index(WithRun_Index(db.path, 'run'))
-        for x in xrange(20):
+        for x in range(20):
             db.insert(dict(a=x % 2, x=x))
         assert db.run('run', 'sum', 0) == 90
         assert db.run('run', 'sum', 1) == 100
@@ -953,7 +953,7 @@ class DB_Tests:
         db = self._db(os.path.join(str(tmpdir), 'db'))
         db.create()
         db.add_index(WithRun_Index(db.path, 'run'))
-        for x in xrange(20):
+        for x in range(20):
             db.insert(dict(a=x % 2, x=x))
         assert db.run('run', 'sum', 0) == 90
         assert db.run('run', 'sum', 1) == 100
@@ -1028,7 +1028,7 @@ class DB_Tests:
         db = self._db(os.path.join(str(tmpdir), 'db'))
         db.create()
         patch_flush_fsync(db)  # patch it
-        for x in xrange(100):
+        for x in range(100):
             db.insert(dict(x=x))
         db.close()
 
@@ -1051,7 +1051,7 @@ x * 10, None
 """
         db.add_index(ok)
 
-        for x in xrange(10):
+        for x in range(10):
             db.insert(dict(x=x))
 
         a = sum(map(lambda x: x['key'], db.all('test_revert')))

@@ -55,19 +55,21 @@ class Parser(object):
         self.stage = 0
         self.logic = ['and', 'or', 'in']
         self.logic2 = ['&', '|']
-        self.allowed_props = {'TreeBasedIndex': ['type', 'name', 'key_format', 'node_capacity', 'pointer_format', 'meta_format'],
-                              'HashIndex': ['type', 'name', 'key_format', 'hash_lim', 'entry_line_format'],
-                              'MultiHashIndex': ['type', 'name', 'key_format', 'hash_lim', 'entry_line_format'],
-                              'MultiTreeBasedIndex': ['type', 'name', 'key_format', 'node_capacity', 'pointer_format', 'meta_format']
-                              }
-        self.funcs = {'md5': (['md5'], ['.digest()']),
-                      'len': (['len'], []),
-                      'str': (['str'], []),
-                      'fix_r': (['self.fix_r'], []),
-                      'prefix': (['self.prefix'], []),
-                      'infix': (['self.infix'], []),
-                      'suffix': (['self.suffix'], [])
-                      }
+        self.allowed_props = {
+            'TreeBasedIndex': ['type', 'name', 'key_format', 'node_capacity', 'pointer_format', 'meta_format'],
+            'HashIndex': ['type', 'name', 'key_format', 'hash_lim', 'entry_line_format'],
+            'MultiHashIndex': ['type', 'name', 'key_format', 'hash_lim', 'entry_line_format'],
+            'MultiTreeBasedIndex': ['type', 'name', 'key_format', 'node_capacity', 'pointer_format', 'meta_format']
+        }
+        self.funcs = {
+            'md5': (['md5'], ['.digest()']),
+            'len': (['len'], []),
+            'str': (['str'], []),
+            'fix_r': (['self.fix_r'], []),
+            'prefix': (['self.prefix'], []),
+            'infix': (['self.infix'], []),
+            'suffix': (['self.suffix'], [])
+        }
         self.handle_int_imports = {'infix': "\n"}
 
         self.funcs_with_body = {'fix_r':
@@ -111,9 +113,9 @@ class Parser(object):
                                 ("""    def infix(self,s,m,l,f):
         t = len(s)
         o = set()
-        for x in xrange(m - 1, l):
+        for x in range(m - 1, l):
             t = (s, )
-            for y in xrange(0, x):
+            for y in range(0, x):
                 t += (s[y + 1:],)
             o.update(set(''.join(x).rjust(f, '_').lower() for x in zip(*t)))
         return o\n""", False)}
@@ -198,11 +200,13 @@ class Parser(object):
             data.append("key")
 
         if data[1] == re.search('\s*', data[1], re.S | re.M).group(0):
-            raise IndexCreatorFunctionException("Empty function body ",
-                                                len(re.split('\n', data[0])) + (len(re.split('\n', data[2])) if self.funcs_rev else 1) - 1)
+            raise IndexCreatorFunctionException(
+                "Empty function body ",
+                len(re.split('\n', data[0])) + (len(re.split('\n', data[2])) if self.funcs_rev else 1) - 1)
         if data[2] == re.search('\s*', data[2], re.S | re.M).group(0):
-            raise IndexCreatorFunctionException("Empty function body ",
-                                                len(re.split('\n', data[0])) + (1 if self.funcs_rev else len(re.split('\n', data[1]))) - 1)
+            raise IndexCreatorFunctionException(
+                "Empty function body ",
+                len(re.split('\n', data[0])) + (1 if self.funcs_rev else len(re.split('\n', data[1]))) - 1)
         if data[0] == re.search('\s*', data[0], re.S | re.M).group(0):
             raise IndexCreatorValueException("You didn't set any properity or you set them not at the begining of the code\n")
 
