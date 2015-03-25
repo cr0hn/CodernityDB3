@@ -34,6 +34,8 @@ __license__ = get_meta(_init_d, '__license__')
 with open('README.rst') as f:
     L_DESCR = f.read()
 
+requires = [
+]
 
 keywords = ' '.join(('database', 'python', 'nosql', 'key-value', 'key/value', 'db'))
 
@@ -48,6 +50,7 @@ setup(name='CodernityDB3',
       packages=['CodernityDB3'],
       platforms='any',
       license=__license__,
+      install_requires=requires,
       classifiers=[
       "License :: OSI Approved :: Apache Software License",
       "Programming Language :: Python",

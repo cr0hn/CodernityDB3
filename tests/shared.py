@@ -538,7 +538,7 @@ class DB_Tests:
             db.destroy_index(index_name)
 
             assert not file_exists_in_indexes_dir(index_name)
-            print file_exists_in_indexes_dir(index_name)
+            print(file_exists_in_indexes_dir(index_name))
             with pytest.raises(IndexNotFoundException):
                 db.get_index_details(index_name)
 #        with instance
@@ -553,7 +553,7 @@ class DB_Tests:
             db.destroy_index(index_to_destory)
 
             assert not file_exists_in_indexes_dir(index_name)
-            print file_exists_in_indexes_dir(index_name)
+            print(file_exists_in_indexes_dir(index_name))
             with pytest.raises(IndexNotFoundException):
                 db.get_index_details(index_name)
 
@@ -572,7 +572,7 @@ class DB_Tests:
                 db.destroy_index(klass(db.path, klass.__name__))
 
             assert file_exists_in_indexes_dir(index_name)
-            print file_exists_in_indexes_dir(index_name)
+            print(file_exists_in_indexes_dir(index_name))
             assert db.get_index_details(index_name)
 
     def test_removing_index_from_db_2(self, tmpdir):

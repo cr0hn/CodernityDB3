@@ -559,6 +559,8 @@ class IU_HashIndex(Index):
         return True
 
     def make_key(self, key):
+        if isinstance(key, str):
+            return bytes(key, 'utf-8')
         return key
 
     def make_key_value(self, data):

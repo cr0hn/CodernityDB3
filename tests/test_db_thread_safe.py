@@ -17,9 +17,9 @@
 
 
 from CodernityDB3.database_thread_safe import ThreadSafeDatabase
-from shared import DB_Tests, WithAIndex
-from hash_tests import HashIndexTests
-from tree_tests import TreeIndexTests
+from tests.shared import DB_Tests, WithAIndex
+from tests.hash_tests import HashIndexTests
+from tests.tree_tests import TreeIndexTests
 
 from threading import Thread
 import os
@@ -61,7 +61,7 @@ class Test_Threads(object):
         assert db.count(db.all, 'with_a') == 100
         l = range(100)
         for curr in db.all('with_a', with_doc=True):
-            print curr
+            print(curr)
             a = curr['doc']['a']
             l.remove(a)
         assert l == []

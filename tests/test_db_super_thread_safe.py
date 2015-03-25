@@ -18,10 +18,10 @@
 
 from CodernityDB3.database_super_thread_safe import SuperThreadSafeDatabase
 
-from shared import DB_Tests
-from hash_tests import HashIndexTests
-from tree_tests import TreeIndexTests
-from test_db_thread_safe import Test_Threads
+from tests.shared import DB_Tests
+from tests.hash_tests import HashIndexTests
+from tests.tree_tests import TreeIndexTests
+from tests.test_db_thread_safe import Test_Threads
 
 
 class Test_Database(DB_Tests):

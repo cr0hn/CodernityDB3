@@ -54,7 +54,7 @@ def compare_for_multi_index(db, name, s, key_name, data, keys):
         db.insert({key_name: i})
 
     # for i in db.all(name):
-        # print i
+        # print(i)
 
     for i, k in keys:
         if k is None:

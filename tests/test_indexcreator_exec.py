@@ -18,7 +18,7 @@
 
 # This test are for checking Parser only, using simple exec isn't exactly
 # what database does with simple index code,
-# they are used only because they allow handy check of correctness of
+# they are used only because they allow handy checsk of correctness of
 # generated code
 
 from CodernityDB3.indexcreator import (
@@ -44,10 +44,10 @@ def pytest_funcarg__p(request):
 def simple_compare(s, args_mkv, args_mk):
     p = Parser()
     n = "_" + uuid.uuid4().hex
-    exec p.parse(s, n)[1] in globals()
+    exec(p.parse(s, n)[1] in globals())
 
     # n2 = p.parse(s)
-    # exec n2 in globals()
+    # exec(n2 in globals())
     # n2 = n2.splitlines()[1][2:]
 
     for a, o in args_mkv:
@@ -64,7 +64,7 @@ def simple_compare(s, args_mkv, args_mk):
 def simple_compare_without_order(s, args_mkv, args_mk):
     p = Parser()
     n = "_" + uuid.uuid4().hex
-    exec p.parse(s, n)[1] in globals()
+    exec(p.parse(s, n)[1] in globals())
 
     for a, o in args_mkv:
         a, b = globals()[n]('test', 'test').make_key_value(a)
@@ -561,7 +561,7 @@ class TestIndexCreatorRightInput:
         0"""
 
         _, n = p.parse(s)
-        exec n in globals()
+        exec(n in globals())
         n = n.splitlines()[1][2:]
         assert globals()[n]('test', 'test').hash_lim == 1
         assert globals()[n]('test', 'test').entry_struct.format[4:7] == '32s'
@@ -576,7 +576,7 @@ class TestIndexCreatorRightInput:
         make_key:
         0"""
         _, n2 = p.parse(s2)
-        exec n2 in globals()
+        exec(n2 in globals())
         n2 = n2.splitlines()[1][2:]
         assert globals()[n2]('test', 'test').hash_lim == 600
         assert globals()[n2]('test', 'test').entry_struct.format[4:7] == '32s'
@@ -591,7 +591,7 @@ class TestIndexCreatorRightInput:
         make_key:
         0"""
         _, n3 = p.parse(s3)
-        exec n3 in globals()
+        exec(n3 in globals())
         n3 = n3.splitlines()[1][2:]
         assert globals()[n3]('test', 'test').hash_lim == 1
         assert globals()[n3]('test', 'test').entry_struct.format[4] == 'I'
@@ -605,7 +605,7 @@ class TestIndexCreatorRightInput:
         make_key:
         0"""
         _, n4 = p.parse(s4)
-        exec n4 in globals()
+        exec(n4 in globals())
         n4 = n4.splitlines()[1][2:]
         assert globals()[n4]('test', 'test').key_format == 'I'
 

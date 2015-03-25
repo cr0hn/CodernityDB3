@@ -72,17 +72,19 @@ class Parser(object):
         }
         self.handle_int_imports = {'infix': "\n"}
 
-        self.funcs_with_body = {'fix_r':
-                                ("""    def fix_r(self,s,l):
+        self.funcs_with_body = {
+            'fix_r': (
+                """    def fix_r(self,s,l):
         e = len(s)
         if e == l:
             return s
         elif e > l:
             return s[:l]
         else:
-            return s.rjust(l,'_')\n""", False),
-                                'prefix':
-                                ("""    def prefix(self,s,m,l,f):
+            return s.rjust(l,b'_')\n""", False),
+
+            'prefix': (
+                """    def prefix(self,s,m,l,f):
         t = len(s)
         if m < 1:
             m = 1
@@ -95,8 +97,8 @@ class Parser(object):
             s = s[:-1]
             t -= 1
         return o\n""", False),
-                                'suffix':
-                                ("""    def suffix(self,s,m,l,f):
+            'suffix': (
+                """    def suffix(self,s,m,l,f):
         t = len(s)
         if m < 1:
             m = 1
@@ -109,8 +111,8 @@ class Parser(object):
             s = s[1:]
             t -= 1
         return o\n""", False),
-                                'infix':
-                                ("""    def infix(self,s,m,l,f):
+            'infix': (
+                """    def infix(self,s,m,l,f):
         t = len(s)
         o = set()
         for x in range(m - 1, l):
@@ -251,7 +253,7 @@ class Parser(object):
 
     def add(self, l, i):
         def add_aux(*args):
-            # print args,self.ind
+            # print(args,self.ind)
             if len(l[i]) < self.ind:
                 l[i].append([])
             l[i][self.ind - 1].append(args)
@@ -352,9 +354,9 @@ class Parser(object):
                 if i not in self.allowed_props[self.index_type]:
                     raise IndexCreatorValueException("Properity %s is not allowed for index type: %s" % (i, self.index_type))
 
-        # print "".join(self.tokens_head)
-        # print "----------"
-        # print (" ".join(self.tokens))
+        # print("".join(self.tokens_head))
+        # print("----------")
+        # print(" ".join(self.tokens))
         return "".join(self.custom_header), "".join(self.tokens_head) + (" ".join(self.tokens))
 
     # has to be run BEFORE tokenize
@@ -512,7 +514,7 @@ class Parser(object):
     def cnt_line_nr(self, l, stage):
         nr = -1
         for n, i in enumerate(self.predata[stage]):
-            # print i,"|||",i.strip(),"|||",l
+            # print(i,"|||",i.strip(),"|||",l)
             if l == i.strip():
                 nr = n
         if nr == -1:
@@ -602,7 +604,7 @@ class Parser(object):
             self.line_cons[stage][pos_start[0] - 1] -= 1
 
         if tk in self.logic2:
-            # print tk
+            # print(tk)
             if line[pos_start[1] - 1] != tk and line[pos_start[1] + 1] != tk:
                 self.tokens += [tk]
             if line[pos_start[1] - 1] != tk and line[pos_start[1] + 1] == tk:

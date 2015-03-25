@@ -15,11 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from shared import DB_Tests
+from tests.shared import DB_Tests
 from CodernityDB3.database import Database
-from hash_tests import HashIndexTests
-from tree_tests import TreeIndexTests
-from shard_tests import ShardTests
+from tests.hash_tests import HashIndexTests
+from tests.tree_tests import TreeIndexTests
+from tests.shard_tests import ShardTests
 
 
 class Test_Database(DB_Tests):

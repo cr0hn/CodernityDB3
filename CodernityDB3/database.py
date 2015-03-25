@@ -936,6 +936,9 @@ you should check index code.""" % (index.name, ex), RuntimeWarning)
         """
         # if not self.indexes_names.has_key(index_name):
         #     raise DatabaseException, "Invalid index name"
+
+        if isinstance(key, str):
+            key = bytes(key, 'utf-8')
         try:
             ind = self.indexes_names[index_name]
         except KeyError:

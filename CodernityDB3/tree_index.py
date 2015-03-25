@@ -54,8 +54,9 @@ class IU_TreeBasedIndex(Index):
 
     custom_header = 'from CodernityDB3.tree_index import TreeBasedIndex'
 
-    def __init__(self, db_path, name, key_format='32s', pointer_format='I',
-                 meta_format='32sIIc', node_capacity=10, storage_class=None):
+    def __init__(
+            self, db_path, name, key_format='32s', pointer_format='I',
+            meta_format='32sIIc', node_capacity=10, storage_class=None):
         if node_capacity < 3:
             raise NodeCapacityException
         super(IU_TreeBasedIndex, self).__init__(db_path, name)
@@ -110,10 +111,10 @@ class IU_TreeBasedIndex(Index):
             self.flag_format
         self.key_size = struct.calcsize('<' + self.key_format)
         self.meta_size = struct.calcsize('<' + self.meta_format)
-        self.single_leaf_record_size = struct.calcsize('<' + self.
-                                                       single_leaf_record_format)
-        self.single_node_record_size = struct.calcsize('<' + self.
-                                                       single_node_record_format)
+        self.single_leaf_record_size = struct.calcsize(
+            '<' + self.single_leaf_record_format)
+        self.single_node_record_size = struct.calcsize(
+            '<' + self.single_node_record_format)
         self.node_size = struct.calcsize('<' + self.node_format)
         self.leaf_size = struct.calcsize('<' + self.leaf_format)
         self.flag_size = struct.calcsize('<' + self.flag_format)
@@ -128,19 +129,22 @@ class IU_TreeBasedIndex(Index):
     def create_index(self):
         if os.path.isfile(os.path.join(self.db_path, self.name + '_buck')):
             raise IndexException('Already exists')
-        with io.open(os.path.join(self.db_path, self.name + "_buck"), 'w+b') as f:
-            props = dict(name=self.name,
-                         flag_format=self.flag_format,
-                         pointer_format=self.pointer_format,
-                         elements_counter_format=self.elements_counter_format,
-                         node_capacity=self.node_capacity,
-                         key_format=self.key_format,
-                         meta_format=self.meta_format,
-                         version=self.__version__,
-                         storage_class=self.storage_class)
+
+        with io.open(os.path.join(
+                self.db_path, self.name + "_buck"), 'w+b') as f:
+            props = dict(
+                name=self.name,
+                flag_format=self.flag_format,
+                pointer_format=self.pointer_format,
+                elements_counter_format=self.elements_counter_format,
+                node_capacity=self.node_capacity,
+                key_format=self.key_format,
+                meta_format=self.meta_format,
+                version=self.__version__,
+                storage_class=self.storage_class)
             f.write(marshal.dumps(props))
-        self.buckets = io.open(os.path.join(self.db_path, self.name +
-                                            "_buck"), 'r+b', buffering=0)
+        self.buckets = io.open(os.path.join(
+            self.db_path, self.name + "_buck"), 'r+b', buffering=0)
         self._create_storage()
         self.buckets.seek(self._start_ind)
         self.buckets.write(struct.pack(b'<c', b'l'))
@@ -169,10 +173,7 @@ class IU_TreeBasedIndex(Index):
         else:
             fixed_leaf = self.leaf_heading_format.encode()
 
-        root = struct.pack(b'<' + fixed_leaf,
-                           0,
-                           0,
-                           0)
+        root = struct.pack(b'<' + fixed_leaf, 0, 0, 0)
         root += self.single_leaf_record_size * self.node_capacity * b'\x00'
         self.buckets.write(root)
         self.flush()
@@ -182,7 +183,7 @@ class IU_TreeBasedIndex(Index):
         if isinstance(doc_id, str):
             doc_id = doc_id.encode()
         if isinstance(key, str):
-            key = key.encode()
+            key = bytes(key, 'utf-8')
         if isinstance(status, str):
             status = status.encode()
 
@@ -230,16 +231,21 @@ class IU_TreeBasedIndex(Index):
         data = self.buckets.read(self.single_node_record_size)
         flag_left, key, pointer_right = struct.unpack(
             '<' + self.single_node_record_format, data)
+        if isinstance(key, str):
+            key = bytes(key, 'utf-8')
         return flag_left, key, pointer_right
 
     def _read_single_leaf_record(self, leaf_start, key_index):
-        r=self._calculate_key_position(
+        r = self._calculate_key_position(
             leaf_start, key_index, 'l')
         if isinstance(r, float):
             r = int(r + 0.5)
         self.buckets.seek(r)
         data = self.buckets.read(self.single_leaf_record_size)
-        key, doc_id, start, size, status = struct.unpack(b'<' + str(self.single_leaf_record_format).encode(), data)
+        key, doc_id, start, size, status = struct.unpack(
+            b'<' + str(self.single_leaf_record_format).encode(), data)
+        if isinstance(key, str):
+            key = bytes(key, 'utf-8')
         return key, doc_id, start, size, status
 
     def _calculate_key_position(self, start, key_index, flag):
@@ -256,7 +262,8 @@ class IU_TreeBasedIndex(Index):
                 start + self.node_heading_size +
                 key_index * (self.pointer_size + self.key_size))
 
-    def _match_doc_id(self, doc_id, key, element_index, leaf_start, nr_of_elements):
+    def _match_doc_id(
+            self, doc_id, key, element_index, leaf_start, nr_of_elements):
         curr_key_index = element_index + 1
         curr_leaf_start = leaf_start
         next_leaf = self._read_leaf_neighbours(leaf_start)[1]
@@ -272,7 +279,8 @@ class IU_TreeBasedIndex(Index):
                     return curr_leaf_start, nr_of_elements, curr_key_index
                 else:
                     curr_key_index = curr_key_index + 1
-            else:  # there are no more elements in current leaf, must jump to next
+            else:
+                # there are no more elements in current leaf, must jump to next
                 if not next_leaf:  # end of leaf linked list
 #                    should't happen, crashes earlier on id index
                     raise DocIdNotFound
@@ -427,37 +435,46 @@ class IU_TreeBasedIndex(Index):
             else:
                 return leaf_start, 0, curr_doc_id, curr_key, curr_start, curr_size, curr_status
 
-    def _find_key_in_leaf_using_binary_search(self, key, leaf_start, nr_of_elements, doc_id=None, mode=None, return_closest=False):
+    def _find_key_in_leaf_using_binary_search(
+            self, key, leaf_start, nr_of_elements, doc_id=None,
+            mode=None, return_closest=False):
         """
         Binary search implementation used in all get functions
         """
         imin, imax = 0, nr_of_elements - 1
         buffer_start, buffer_end = self._set_buffer_limits()
         candidate_start, candidate_index, move_buffer = \
-            self._choose_next_candidate_index_in_leaf(leaf_start,
-                                                      self._calculate_key_position(leaf_start,
-                                                                                   (imin + imax) / 2,
-                                                                                   'l'),
-                                                      buffer_start,
-                                                      buffer_end,
-                                                      imin, imax)
+            self._choose_next_candidate_index_in_leaf(
+                leaf_start,
+                self._calculate_key_position(
+                    leaf_start,
+                    (imin + imax) / 2,
+                    'l'),
+                buffer_start,
+                buffer_end,
+                imin, imax)
         while imax != imin and imax > imin:
-            curr_key, curr_doc_id, curr_start, curr_size, curr_status = self._read_single_leaf_record(leaf_start,
-                                                                                                      candidate_index)
+            (curr_key, curr_doc_id, curr_start, curr_size,
+             curr_status) = self._read_single_leaf_record(
+                 leaf_start, candidate_index)
             candidate_start = self._calculate_key_position(
                 leaf_start, candidate_index, 'l')
             if key < curr_key:
                 if move_buffer == MOVE_BUFFER_PREV:
                     buffer_start, buffer_end = self._prev_buffer(
                         buffer_start, buffer_end)
-                else:  # if next chosen element is in current buffer, abort moving to other
+                else:
+                    # if next chosen element is in current buffer,
+                    # abort moving to other
                     move_buffer is None
                 imax = candidate_index - 1
-                candidate_start, candidate_index, move_buffer = self._choose_next_candidate_index_in_leaf(leaf_start,
-                                                                                                          candidate_start,
-                                                                                                          buffer_start,
-                                                                                                          buffer_end,
-                                                                                                          imin, imax)
+                (candidate_start, candidate_index,
+                 move_buffer) = self._choose_next_candidate_index_in_leaf(
+                     leaf_start,
+                     candidate_start,
+                     buffer_start,
+                     buffer_end,
+                     imin, imax)
             elif key == curr_key:
                 if mode == MODE_LAST:
                     if move_buffer == MOVE_BUFFER_NEXT:
@@ -532,64 +549,106 @@ class IU_TreeBasedIndex(Index):
                                                                                                           matching_record_index)
             if doc_id is not None and doc_id != curr_doc_id:
                 leaf_start, nr_of_elements, matching_record_index, curr_status = \
-                    self._match_doc_id(doc_id,
-                                       key,
-                                       matching_record_index,
-                                       leaf_start,
-                                       nr_of_elements)
+                    self._match_doc_id(
+                        doc_id,
+                        key,
+                        matching_record_index,
+                        leaf_start,
+                        nr_of_elements)
                 curr_key, curr_doc_id, curr_start, curr_size, curr_status = \
-                    self._read_single_leaf_record(leaf_start,
-                                                  matching_record_index)
+                    self._read_single_leaf_record(
+                        leaf_start,
+                        matching_record_index)
             return leaf_start, matching_record_index, curr_doc_id, curr_key, curr_start, curr_size, curr_status
 
     def _find_place_in_leaf(self, key, leaf_start, nr_of_elements):
+        """
+        Look for a place in a leaf to put new elements.
+        Returns a tuple with the values:
+            leaf_start
+            new_record_position
+            nr_of_records_to_rewrite
+            full_leaf
+            on_deleted
+        """
+        #TODO: understand and write about the params and returns
+        #of this method
         if nr_of_elements == 1:
             return self._find_place_in_leaf_with_one_element(key, leaf_start)
         else:
-            return self._find_place_in_leaf_using_binary_search(key, leaf_start, nr_of_elements)
+            return self._find_place_in_leaf_using_binary_search(
+                key, leaf_start, nr_of_elements)
 
     def _find_place_in_leaf_with_one_element(self, key, leaf_start):
+        '''
+        Returns a tuple with the values:
+            leaf_start
+            new_record_position
+            nr_of_records_to_rewrite
+            full_leaf
+            on_deleted
+        '''
+        #TODO: understand and write about the params and returns
+        #of this method
         curr_key, curr_doc_id, curr_start, curr_size,\
             curr_status = self._read_single_leaf_record(leaf_start, 0)
         if curr_status == 'd':
-                return leaf_start, 0, 0, False, True  # leaf start, index of new key position, nr of rec to rewrite, full_leaf flag, on_deleted flag
+            # leaf start, index of new key position, nr of rec to rewrite,
+            # full_leaf flag, on_deleted flag
+            return leaf_start, 0, 0, False, True
         else:
             if key < curr_key:
                 return leaf_start, 0, 1, False, False
             else:
                 return leaf_start, 1, 0, False, False
 
-    def _find_place_in_leaf_using_binary_search(self, key, leaf_start, nr_of_elements):
-        """
+    def _find_place_in_leaf_using_binary_search(
+            self, key, leaf_start, nr_of_elements):
+        '''
         Binary search implementation used in insert function
-        """
+        Returns a tuple with the values:
+            leaf_start
+            new_record_position
+            nr_of_records_to_rewrite
+            full_leaf
+            on_deleted
+        '''
+        #TODO: understand and write about the params and returns
+        #of this method
         imin, imax = 0, nr_of_elements - 1
         buffer_start, buffer_end = self._set_buffer_limits()
         candidate_start, candidate_index, move_buffer = self.\
-            _choose_next_candidate_index_in_leaf(leaf_start,
-                                                 self._calculate_key_position(leaf_start,
-                                                                              (imin + imax) / 2,
-                                                                              'l'),
-                                                 buffer_start,
-                                                 buffer_end,
-                                                 imin, imax)
+            _choose_next_candidate_index_in_leaf(
+                leaf_start,
+                self._calculate_key_position(
+                    leaf_start,
+                    (imin + imax) / 2,
+                    'l'),
+                buffer_start,
+                buffer_end,
+                imin, imax)
         while imax != imin and imax > imin:
-            curr_key, curr_doc_id, curr_start, curr_size, curr_status = self._read_single_leaf_record(leaf_start,
-                                                                                                      candidate_index)
+            (curr_key, curr_doc_id, curr_start,
+             curr_size, curr_status) = self._read_single_leaf_record(
+                 leaf_start, candidate_index)
             candidate_start = self._calculate_key_position(
                 leaf_start, candidate_index, 'l')
             if key < curr_key:
                 if move_buffer == MOVE_BUFFER_PREV:
                     buffer_start, buffer_end = self._prev_buffer(
                         buffer_start, buffer_end)
-                else:  # if next chosen element is in current buffer, abort moving to other
+                else:
+                    # if next chosen element is in current
+                    # buffer, abort moving to other
                     move_buffer = None
                 imax = candidate_index - 1
-                candidate_start, candidate_index, move_buffer = self._choose_next_candidate_index_in_leaf(leaf_start,
-                                                                                                          candidate_start,
-                                                                                                          buffer_start,
-                                                                                                          buffer_end,
-                                                                                                          imin, imax)
+                (candidate_start, candidate_index,
+                 move_buffer) = self._choose_next_candidate_index_in_leaf(
+                     leaf_start,
+                     candidate_start,
+                     buffer_start,
+                     buffer_end,
+                     imin, imax)
             else:
                 if move_buffer == MOVE_BUFFER_NEXT:
                     buffer_start, buffer_end = self._next_buffer(
@@ -597,56 +656,106 @@ class IU_TreeBasedIndex(Index):
                 else:
                     move_buffer is None
                 imin = candidate_index + 1
-                candidate_start, candidate_index, move_buffer = self._choose_next_candidate_index_in_leaf(leaf_start,
-                                                                                                          candidate_start,
-                                                                                                          buffer_start,
-                                                                                                          buffer_end,
-                                                                                                          imin, imax)
+                (candidate_start, candidate_index,
+                 move_buffer) = self._choose_next_candidate_index_in_leaf(
+                     leaf_start,
+                     candidate_start,
+                     buffer_start,
+                     buffer_end,
+                     imin, imax)
+
         if imax < imin and imin < nr_of_elements:
             chosen_key_position = imin
         else:
             chosen_key_position = imax
-        curr_key, curr_doc_id, curr_start, curr_size, curr_status = self._read_single_leaf_record(leaf_start,
-                                                                                                  chosen_key_position)
+        (curr_key, curr_doc_id, curr_start,
+         curr_size, curr_status) = self._read_single_leaf_record(
+             leaf_start,
+             chosen_key_position)
+
         if curr_status == 'd':
-            return leaf_start, chosen_key_position, 0, False, True
+            new_record_position = chosen_key_position
+            nr_of_records_to_rewrite = 0
+            full_leaf = False
+            on_deleted = True
         elif key < curr_key:
             if chosen_key_position > 0:
-                curr_key, curr_doc_id, curr_start, curr_size, curr_status = self._read_single_leaf_record(leaf_start,
-                                                                                                          chosen_key_position - 1)
+                (curr_key, curr_doc_id, curr_start,
+                 curr_size, curr_status) = self._read_single_leaf_record(
+                     leaf_start,
+                     chosen_key_position - 1)
                 if curr_start == 'd':
-                    return leaf_start, chosen_key_position - 1, 0, False, True
+                    new_record_position = chosen_key_position - 1
+                    nr_of_records_to_rewrite = 0
+                    full_leaf = False
+                    on_deleted = True
                 else:
-                    return leaf_start, chosen_key_position, nr_of_elements - chosen_key_position, (nr_of_elements == self.node_capacity), False
+                    new_record_position = chosen_key_position
+                    nr_of_records_to_rewrite = (
+                        nr_of_elements - chosen_key_position)
+                    full_leaf = (nr_of_elements == self.node_capacity)
+                    on_deleted = False
             else:
-                return leaf_start, chosen_key_position, nr_of_elements - chosen_key_position, (nr_of_elements == self.node_capacity), False
+                new_record_position = chosen_key_position
+                nr_of_records_to_rewrite = nr_of_elements - chosen_key_position
+                full_leaf = (nr_of_elements == self.node_capacity)
+                on_deleted = False
         else:
             if chosen_key_position < nr_of_elements - 1:
-                curr_key, curr_doc_id, curr_start, curr_size, curr_status = self._read_single_leaf_record(leaf_start,
-                                                                                                          chosen_key_position + 1)
+                (curr_key, curr_doc_id, curr_start,
+                 curr_size, curr_status) = self._read_single_leaf_record(
+                     leaf_start,
+                     chosen_key_position + 1)
                 if curr_start == 'd':
-                    return leaf_start, chosen_key_position + 1, 0, False, True
+                    new_record_position = chosen_key_position + 1
+                    nr_of_records_to_rewrite = 0
+                    full_leaf = False
+                    on_deleted = True
                 else:
-                    return leaf_start, chosen_key_position + 1, nr_of_elements - chosen_key_position - 1, (nr_of_elements == self.node_capacity), False
+                    new_record_position = chosen_key_position + 1
+                    nr_of_records_to_rewrite = (
+                        nr_of_elements - chosen_key_position - 1)
+                    full_leaf = (nr_of_elements == self.node_capacity)
+                    on_deleted = False
             else:
-                return leaf_start, chosen_key_position + 1, nr_of_elements - chosen_key_position - 1, (nr_of_elements == self.node_capacity), False
+                new_record_position = chosen_key_position + 1
+                nr_of_records_to_rewrite = (
+                    nr_of_elements - chosen_key_position - 1)
+                full_leaf = (nr_of_elements == self.node_capacity)
+                on_deleted = False
+
+        if nr_of_records_to_rewrite < 0:
+            nr_of_records_to_rewrite = 0
+        if isinstance(nr_of_records_to_rewrite, float):
+            nr_of_records_to_rewrite = int(nr_of_records_to_rewrite)
+        return (
+            leaf_start,
+            new_record_position,
+            nr_of_records_to_rewrite,
+            full_leaf,
+            on_deleted)
 
     def _set_buffer_limits(self):
         pos = self.buckets.tell()
         buffer_start = pos - (pos % tree_buffer_size)
         return buffer_start, (buffer_start + tree_buffer_size)
 
-    def _find_first_key_occurence_in_node(self, node_start, key, nr_of_elements):
+    def _find_first_key_occurence_in_node(
+            self, node_start, key, nr_of_elements):
         if nr_of_elements == 1:
-            return self._find_key_in_node_with_one_element(key, node_start, mode=MODE_FIRST)
+            return self._find_key_in_node_with_one_element(
+                key, node_start, mode=MODE_FIRST)
         else:
-            return self._find_key_in_node_using_binary_search(key, node_start, nr_of_elements, mode=MODE_FIRST)
+            return self._find_key_in_node_using_binary_search(
+                key, node_start, nr_of_elements, mode=MODE_FIRST)
 
     def _find_last_key_occurence_in_node(self, node_start, key, nr_of_elements):
         if nr_of_elements == 1:
-            return self._find_key_in_node_with_one_element(key, node_start, mode=MODE_LAST)
+            return self._find_key_in_node_with_one_element(
+                key, node_start, mode=MODE_LAST)
         else:
-            return self._find_key_in_node_using_binary_search(key, node_start, nr_of_elements, mode=MODE_LAST)
+            return self._find_key_in_node_using_binary_search(
+                key, node_start, nr_of_elements, mode=MODE_LAST)
 
     def _find_key_in_node_with_one_element(self, key, node_start, mode=None):
         l_pointer, curr_key, r_pointer = self._read_single_node_key(
@@ -766,9 +875,10 @@ class IU_TreeBasedIndex(Index):
         self._read_leaf_nr_of_elements.delete(leaf_start)
         self._read_leaf_nr_of_elements_and_neighbours.delete(leaf_start)
 
-    def _update_leaf(self, leaf_start, new_record_position, nr_of_elements,
-                     nr_of_records_to_rewrite, on_deleted, new_key,
-                     new_doc_id, new_start, new_size, new_status):
+    def _update_leaf(
+            self, leaf_start, new_record_position, nr_of_elements,
+            nr_of_records_to_rewrite, on_deleted, new_key,
+            new_doc_id, new_start, new_size, new_status):
         # # Fix types
         if isinstance(self.single_leaf_record_format, str):
             fixed_leaf = self.single_leaf_record_format.encode()
@@ -785,18 +895,20 @@ class IU_TreeBasedIndex(Index):
             self.buckets.seek(self._calculate_key_position(
                 leaf_start, new_record_position, 'l'))
             self.buckets.write(
-                struct.pack(b'<' + fixed_leaf,
-                            new_key,
-                            new_doc_id,
-                            new_start,
-                            new_size,
-                            new_status))
+                struct.pack(
+                    b'<' + fixed_leaf,
+                    new_key,
+                    new_doc_id,
+                    new_start,
+                    new_size,
+                    new_status))
             self.flush()
         else:  # must read all elems after new one, and rewrite them after new
             start = self._calculate_key_position(
                 leaf_start, new_record_position, 'l')
             helper = self.single_leaf_record_size
             self.buckets.seek(start)
+            helper = self.single_leaf_record_size
             data = self.buckets.read(
                 nr_of_records_to_rewrite *
                 self.single_leaf_record_size)
@@ -1436,7 +1548,9 @@ class IU_TreeBasedIndex(Index):
         self._read_leaf_nr_of_elements.delete(leaf_start)
         self._read_leaf_nr_of_elements_and_neighbours.delete(leaf_start)
 
-    def _insert_new_record_into_leaf(self, leaf_start, key, doc_id, start, size, status, nodes_stack, indexes):
+    def _insert_new_record_into_leaf(
+            self, leaf_start, key, doc_id, start, size,
+            status, nodes_stack, indexes):
         if isinstance(status, bytes):
             status = status.decode()
 
@@ -1446,29 +1560,35 @@ class IU_TreeBasedIndex(Index):
             self.insert_first_record_into_leaf(
                 leaf_start, key, doc_id, start, size, status)
             return
-        leaf_start, new_record_position, nr_of_records_to_rewrite, full_leaf, on_deleted\
-            = self._find_place_in_leaf(key, leaf_start, nr_of_elements)
+
+        (leaf_start, new_record_position, nr_of_records_to_rewrite,
+         full_leaf, on_deleted) = self._find_place_in_leaf(
+             key, leaf_start, nr_of_elements)
+
         if full_leaf:
             try:  # check if leaf has parent node
                 leaf_parent_pointer = nodes_stack.pop()
             except IndexError:  # leaf is a root
                 leaf_parent_pointer = 0
-            split_data = self._split_leaf(leaf_start,
-                                          nr_of_records_to_rewrite,
-                                          key,
-                                          doc_id,
-                                          start,
-                                          size,
-                                          status,
-                                          create_new_root=(False if leaf_parent_pointer else True))
-            if split_data is not None:  # means that split created new root or replaced split with update_if_has_deleted
+            split_data = self._split_leaf(
+                leaf_start,
+                nr_of_records_to_rewrite,
+                key,
+                doc_id,
+                start,
+                size,
+                status,
+                create_new_root=(False if leaf_parent_pointer else True))
+            if split_data is not None:
+                # means that split created new root or replaced split with update_if_has_deleted
                 new_leaf_start_position, key_moved_to_parent_node = split_data
-                self._insert_new_key_into_node(leaf_parent_pointer,
-                                               key_moved_to_parent_node,
-                                               leaf_start,
-                                               new_leaf_start_position,
-                                               nodes_stack,
-                                               indexes)
+                self._insert_new_key_into_node(
+                    leaf_parent_pointer,
+                    key_moved_to_parent_node,
+                    leaf_start,
+                    new_leaf_start_position,
+                    nodes_stack,
+                    indexes)
         else:  # there is a place for record in leaf
             self.buckets.seek(leaf_start)
             self._update_leaf(
@@ -1594,8 +1714,12 @@ class IU_TreeBasedIndex(Index):
             return curr_position
 
     def _find_key(self, key):
+        if isinstance(key, str):
+            key = bytes(key, 'utf-8')
         containing_leaf_start = self._find_leaf_with_first_key_occurence(key)
-        nr_of_elements, prev_leaf, next_leaf = self._read_leaf_nr_of_elements_and_neighbours(containing_leaf_start)
+        nr_of_elements, prev_leaf, next_leaf = (
+            self._read_leaf_nr_of_elements_and_neighbours(
+                containing_leaf_start))
         try:
             doc_id, l_key, start, size, status = self._find_key_in_leaf(
                 containing_leaf_start, key, nr_of_elements)
@@ -1922,15 +2046,13 @@ class IU_TreeBasedIndex(Index):
     def get(self, key):
         ## print("------", type(key)) # TODO
         ## print(self) # TODO
+        if isinstance(key, str):
+            key = bytes(key, 'utf-8')
         k = self.make_key(key)
         ## print("K:" * 10, k) # TODO
-        if isinstance(k, str):
-            k = bytes(k, 'utf-8')
         return self._find_key(k)
 
     def get_many(self, key, limit=1, offset=0):
-        if isinstance(key, str):
-            key = bytes(key, 'utf-8')
         return self._find_key_many(self.make_key(key), limit, offset)
 
     def get_between(self, start, end, limit=1, offset=0, inclusive_start=True, inclusive_end=True):
@@ -2109,6 +2231,8 @@ class IU_MultiTreeBasedIndex(IU_TreeBasedIndex):
             delete(doc_id, curr_key, start, size)
 
     def get(self, key):
+        if isinstance(key, str):
+            key = bytes(key, 'utf-8')
         return super(IU_MultiTreeBasedIndex, self).get(key)
 
     def make_key_value(self, data):

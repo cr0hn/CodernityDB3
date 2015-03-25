@@ -39,11 +39,11 @@ class SuperLock(type):
         def _inner(*args, **kwargs):
             db = args[0]
             with db.super_lock:
-#                print '=>', f.__name__, repr(args[1:])
+#                print('=>', f.__name__, repr(args[1:]))
                 res = f(*args, **kwargs)
 #                if db.opened:
 #                    db.flush()
-#                print '<=', f.__name__, repr(args[1:])
+#                print('<=', f.__name__, repr(args[1:]))
                 return res
         return _inner
 
