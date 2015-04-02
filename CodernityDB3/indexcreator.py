@@ -55,32 +55,36 @@ class Parser(object):
         self.stage = 0
         self.logic = ['and', 'or', 'in']
         self.logic2 = ['&', '|']
-        self.allowed_props = {'TreeBasedIndex': ['type', 'name', 'key_format', 'node_capacity', 'pointer_format', 'meta_format'],
-                              'HashIndex': ['type', 'name', 'key_format', 'hash_lim', 'entry_line_format'],
-                              'MultiHashIndex': ['type', 'name', 'key_format', 'hash_lim', 'entry_line_format'],
-                              'MultiTreeBasedIndex': ['type', 'name', 'key_format', 'node_capacity', 'pointer_format', 'meta_format']
-                              }
-        self.funcs = {'md5': (['md5'], ['.digest()']),
-                      'len': (['len'], []),
-                      'str': (['str'], []),
-                      'fix_r': (['self.fix_r'], []),
-                      'prefix': (['self.prefix'], []),
-                      'infix': (['self.infix'], []),
-                      'suffix': (['self.suffix'], [])
-                      }
-        self.handle_int_imports = {'infix': "from itertools import izip\n"}
+        self.allowed_props = {
+            'TreeBasedIndex': ['type', 'name', 'key_format', 'node_capacity', 'pointer_format', 'meta_format'],
+            'HashIndex': ['type', 'name', 'key_format', 'hash_lim', 'entry_line_format'],
+            'MultiHashIndex': ['type', 'name', 'key_format', 'hash_lim', 'entry_line_format'],
+            'MultiTreeBasedIndex': ['type', 'name', 'key_format', 'node_capacity', 'pointer_format', 'meta_format']
+        }
+        self.funcs = {
+            'md5': (['md5'], ['.digest()']),
+            'len': (['len'], []),
+            'str': (['str'], []),
+            'fix_r': (['self.fix_r'], []),
+            'prefix': (['self.prefix'], []),
+            'infix': (['self.infix'], []),
+            'suffix': (['self.suffix'], [])
+        }
+        self.handle_int_imports = {'infix': "\n"}
 
-        self.funcs_with_body = {'fix_r':
-                                ("""    def fix_r(self,s,l):
+        self.funcs_with_body = {
+            'fix_r': (
+                """    def fix_r(self,s,l):
         e = len(s)
         if e == l:
             return s
         elif e > l:
             return s[:l]
         else:
-            return s.rjust(l,'_')\n""", False),
-                                'prefix':
-                                ("""    def prefix(self,s,m,l,f):
+            return s.rjust(l,b'_')\n""", False),
+
+            'prefix': (
+                """    def prefix(self,s,m,l,f):
         t = len(s)
         if m < 1:
             m = 1
@@ -93,8 +97,8 @@ class Parser(object):
             s = s[:-1]
             t -= 1
         return o\n""", False),
-                                'suffix':
-                                ("""    def suffix(self,s,m,l,f):
+            'suffix': (
+                """    def suffix(self,s,m,l,f):
         t = len(s)
         if m < 1:
             m = 1
@@ -107,15 +111,15 @@ class Parser(object):
             s = s[1:]
             t -= 1
         return o\n""", False),
-                                'infix':
-                                ("""    def infix(self,s,m,l,f):
+            'infix': (
+                """    def infix(self,s,m,l,f):
         t = len(s)
         o = set()
-        for x in xrange(m - 1, l):
+        for x in range(m - 1, l):
             t = (s, )
-            for y in xrange(0, x):
+            for y in range(0, x):
                 t += (s[y + 1:],)
-            o.update(set(''.join(x).rjust(f, '_').lower() for x in izip(*t)))
+            o.update(set(''.join(x).rjust(f, '_').lower() for x in zip(*t)))
         return o\n""", False)}
         self.none = ['None', 'none', 'null']
         self.props_assign = ['=', ':']
@@ -198,11 +202,13 @@ class Parser(object):
             data.append("key")
 
         if data[1] == re.search('\s*', data[1], re.S | re.M).group(0):
-            raise IndexCreatorFunctionException("Empty function body ",
-                                                len(re.split('\n', data[0])) + (len(re.split('\n', data[2])) if self.funcs_rev else 1) - 1)
+            raise IndexCreatorFunctionException(
+                "Empty function body ",
+                len(re.split('\n', data[0])) + (len(re.split('\n', data[2])) if self.funcs_rev else 1) - 1)
         if data[2] == re.search('\s*', data[2], re.S | re.M).group(0):
-            raise IndexCreatorFunctionException("Empty function body ",
-                                                len(re.split('\n', data[0])) + (1 if self.funcs_rev else len(re.split('\n', data[1]))) - 1)
+            raise IndexCreatorFunctionException(
+                "Empty function body ",
+                len(re.split('\n', data[0])) + (1 if self.funcs_rev else len(re.split('\n', data[1]))) - 1)
         if data[0] == re.search('\s*', data[0], re.S | re.M).group(0):
             raise IndexCreatorValueException("You didn't set any properity or you set them not at the begining of the code\n")
 
@@ -247,7 +253,7 @@ class Parser(object):
 
     def add(self, l, i):
         def add_aux(*args):
-            # print args,self.ind
+            # print(args,self.ind)
             if len(l[i]) < self.ind:
                 l[i].append([])
             l[i][self.ind - 1].append(args)
@@ -273,23 +279,30 @@ class Parser(object):
         self.custom_header = set()
 
         self.tokens = []
-        self.tokens_head = ['# %s\n' % self.name, 'class %s(' % self.name, '):\n', '    def __init__(self, *args, **kwargs):        ']
+        self.tokens_head = [
+            '# %s\n' % self.name,
+            'class %s(' % self.name, '):\n',
+            '    def __init__(self, *args, **kwargs):        ']
 
         for i in range(3):
-            tokenize.tokenize(self.readline(i), self.add(self.pre_tokens, i))
+            for tolkien in tokenize.generate_tokens(self.readline(i)):
+                t = tuple(tolkien)
+                self.add(self.pre_tokens, i)(*t)
             # tokenize treats some keyword not in the right way, thats why we
             # have to change some of them
             for nk, k in enumerate(self.pre_tokens[i]):
                 for na, a in enumerate(k):
                     if a[0] == token.NAME and a[1] in self.logic:
-                        self.pre_tokens[i][nk][
-                            na] = (token.OP, a[1], a[2], a[3], a[4])
+                        self.pre_tokens[i][nk][na] = (
+                            token.OP, a[1], a[2], a[3], a[4])
 
         for i in self.pre_tokens[1]:
             self.line_cons[1].append(self.check_colons(i, 1))
             self.check_adjacents(i, 1)
             if self.check_for_2nd_arg(i) == -1 and not self.is_one_arg_enough:
-                raise IndexCreatorValueException("No 2nd value to return (did u forget about ',None'?", self.cnt_line_nr(i[0][4], 1))
+                raise IndexCreatorValueException(
+                    "No 2nd value to return (did u forget about ',None'?",
+                    self.cnt_line_nr(i[0][4], 1))
             self.is_one_arg_enough = False
 
         for i in self.pre_tokens[2]:
@@ -341,9 +354,9 @@ class Parser(object):
                 if i not in self.allowed_props[self.index_type]:
                     raise IndexCreatorValueException("Properity %s is not allowed for index type: %s" % (i, self.index_type))
 
-        # print "".join(self.tokens_head)
-        # print "----------"
-        # print (" ".join(self.tokens))
+        # print("".join(self.tokens_head))
+        # print("----------")
+        # print(" ".join(self.tokens))
         return "".join(self.custom_header), "".join(self.tokens_head) + (" ".join(self.tokens))
 
     # has to be run BEFORE tokenize
@@ -501,7 +514,7 @@ class Parser(object):
     def cnt_line_nr(self, l, stage):
         nr = -1
         for n, i in enumerate(self.predata[stage]):
-            # print i,"|||",i.strip(),"|||",l
+            # print(i,"|||",i.strip(),"|||",l)
             if l == i.strip():
                 nr = n
         if nr == -1:
@@ -591,7 +604,7 @@ class Parser(object):
             self.line_cons[stage][pos_start[0] - 1] -= 1
 
         if tk in self.logic2:
-            # print tk
+            # print(tk)
             if line[pos_start[1] - 1] != tk and line[pos_start[1] + 1] != tk:
                 self.tokens += [tk]
             if line[pos_start[1] - 1] != tk and line[pos_start[1] + 1] == tk:

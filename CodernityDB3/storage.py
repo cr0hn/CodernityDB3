@@ -23,7 +23,7 @@ import io
 
 
 try:
-    from CodernityDB import __version__
+    from CodernityDB3 import __version__
 except ImportError:
     from .__init__ import __version__
 

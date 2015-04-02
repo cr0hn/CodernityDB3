@@ -34,7 +34,7 @@ from CodernityDB3.storage import IU_Storage, DummyStorage
 from CodernityDB3.env import cdb_environment
 
 if cdb_environment.get('rlock_obj'):
-    from CodernityDB import patch
+    from CodernityDB3 import patch
     patch.patch_cache_rr(cdb_environment['rlock_obj'])
 
 from CodernityDB3.rr_cache import cache1lvl
@@ -43,7 +43,7 @@ from CodernityDB3.rr_cache import cache1lvl
 from CodernityDB3.misc import random_hex_32
 
 try:
-    from CodernityDB import __version__
+    from CodernityDB3 import __version__
 except ImportError:
     from .__init__ import __version__
 
@@ -559,6 +559,8 @@ class IU_HashIndex(Index):
         return True
 
     def make_key(self, key):
+        if isinstance(key, str):
+            return bytes(key, 'utf-8')
         return key
 
     def make_key_value(self, data):
