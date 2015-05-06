@@ -824,7 +824,7 @@ you should check index code.""" % (index.name, ex), RuntimeWarning)
         doc_id, rev, start, size, status = self.id_ind.get(
             data['_id'])  # it's cached so it's ok
         print(status)
-        if status != 'd' and status != 'u':
+        if status != b'd' and status != b'u':
             self._single_insert_index(index, data, doc_id)
 
     def reindex_index(self, index):
@@ -913,7 +913,8 @@ you should check index code.""" % (index.name, ex), RuntimeWarning)
             raise PreconditionsException("Can't update without _rev or _id")
         _rev = data['_rev']
         try:
-            _rev = bytes(_rev)
+            # _rev = bytes(_rev)
+            pass
         except:
             self.__not_opened()
             raise PreconditionsException(
@@ -951,7 +952,7 @@ you should check index code.""" % (index.name, ex), RuntimeWarning)
             raise RecordNotFound(ex)
         if not start and not size:
             raise RecordNotFound("Not found")
-        elif status == 'd':
+        elif status == b'd':
             raise RecordDeleted("Deleted")
         if with_storage and size:
             storage = ind.storage
@@ -1133,8 +1134,7 @@ you should check index code.""" % (index.name, ex), RuntimeWarning)
         _id = data['_id']
         _rev = data['_rev']
         try:
-            _id = bytes(_id)
-            _rev = bytes(_rev)
+            pass
         except:
             raise PreconditionsException(
                 "`_id` and `_rev` must be valid bytes object")

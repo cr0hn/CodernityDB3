@@ -172,11 +172,11 @@ class IU_HashIndex(Index):
                 return None, None, 0, 0, 'u'
             found_at, doc_id, l_key, start, size, status, _next = self._locate_key(
                 key, location)
-            if status == 'd':  # when first record from many is deleted
+            if status == b'd':  # when first record from many is deleted
                 while True:
                     found_at, doc_id, l_key, start, size, status, _next = self._locate_key(
                         key, _next)
-                    if status != 'd':
+                    if status != b'd':
                         break
             return doc_id, l_key, start, size, status
         else:
@@ -202,7 +202,7 @@ class IU_HashIndex(Index):
             except IndexException:
                 break
             else:
-                if status != 'd':
+                if status != b'd':
                     if l_key == key:  # in case of hash function conflicts
                         offset -= 1
                 location = _next
@@ -215,7 +215,7 @@ class IU_HashIndex(Index):
             except IndexException:
                 break
             else:
-                if status != 'd':
+                if status != b'd':
                     if l_key == key:  # in case of hash function conflicts
                         yield doc_id, start, size, status
                         limit -= 1
@@ -310,7 +310,7 @@ class IU_HashIndex(Index):
             data = self.buckets.read(self.entry_line_size)
             # todo, maybe partial read there...
             doc_id, l_key, start, size, status, _next = self.entry_struct.unpack(data)
-            if not _next or status == 'd':
+            if not _next or status == b'd':
                 return self.buckets.tell() - self.entry_line_size, doc_id, l_key, start, size, status, _next
             else:
                 location = _next  # go to next record
@@ -442,7 +442,7 @@ class IU_HashIndex(Index):
             except IndexException:
                 break
             else:
-                if status != 'd':
+                if status != b'd':
                     offset -= 1
         while limit:
             curr_data = self.buckets.read(self.entry_line_size)
@@ -453,7 +453,7 @@ class IU_HashIndex(Index):
             except IndexException:
                 break
             else:
-                if status != 'd':
+                if status != b'd':
                     yield doc_id, key, start, size, status
                     limit -= 1
 
@@ -513,7 +513,7 @@ class IU_HashIndex(Index):
                                                   key,
                                                   start,
                                                   size,
-                                                  'd',
+                                                  b'd',
                                                   _next))
         self.flush()
         # self._fix_link(_key, _prev, _next)
@@ -653,7 +653,7 @@ class IU_UniqueHashIndex(IU_HashIndex):
                 data)
             if l_key == key:
                 raise IndexException("The '%s' key already exists" % key)
-            if not _next or status == 'd':
+            if not _next or status == b'd':
                 return self.buckets.tell() - self.entry_line_size, l_key, rev, start, size, status, _next
             else:
                 location = _next  # go to next record
@@ -808,7 +808,7 @@ class IU_UniqueHashIndex(IU_HashIndex):
             except IndexException:
                 break
             else:
-                if status != 'd':
+                if status != b'd':
                     offset -= 1
 
         while limit:
@@ -820,7 +820,7 @@ class IU_UniqueHashIndex(IU_HashIndex):
             except IndexException:
                 break
             else:
-                if status != 'd':
+                if status != b'd':
                     yield doc_id, rev, start, size, status
                     limit -= 1
 
@@ -832,7 +832,7 @@ class IU_UniqueHashIndex(IU_HashIndex):
         if isinstance(key, str):
             key = key.encode()
 
-        self.update(key, '00000000', start, size, 'd')
+        self.update(key, '00000000', start, size, b'd')
 
     def make_key_value(self, data):
         _id = data['_id']
