@@ -138,13 +138,13 @@ def database_step_by_step(db_obj, path=None):
                 except:
                     packed = json.dumps((funct_name,
                                          meth_args, kwargs_copy, None))
-                    f_obj.write('%s\n' % packed)
+                    f_obj.write(bytes('%s\n' % packed, 'utf-8'))
                     f_obj.flush()
                     raise
                 else:
                     packed = json.dumps((funct_name,
                                          meth_args, kwargs_copy, res))
-                f_obj.write('%s\n' % packed)
+                f_obj.write(bytes('%s\n' % packed, 'utf-8'))
                 f_obj.flush()
             else:
                 if funct_name == 'get':
@@ -153,7 +153,7 @@ def database_step_by_step(db_obj, path=None):
                             remove_from_stack(funct_name)
                             return f(*args, **kwargs)
                 packed = json.dumps((funct_name, meth_args, kwargs_copy))
-                f_obj.write('%s\n' % packed)
+                f_obj.write(bytes('%s\n' % packed, 'utf-8'))
                 f_obj.flush()
                 res = f(*args, **kwargs)
             remove_from_stack(funct_name)
