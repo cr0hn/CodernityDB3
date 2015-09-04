@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # custom_hash_index
 # CustomHashIndex
 
@@ -31,7 +30,7 @@ class CustomHashIndex(HashIndex):
         d = data.get('test')
         if d is None:
             return None
-        if d > 5:
+        if d > str(5):
             k = 1
         else:
             k = 0

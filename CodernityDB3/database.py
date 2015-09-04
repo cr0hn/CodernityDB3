@@ -227,6 +227,7 @@ class Database(object):
             if len(new_index.splitlines()) < 4 or new_index.splitlines()[3] != '# inserted automatically':
                 from .indexcreator import Parser
                 par = Parser()
+                # s = par.parse(new_index).splitlines()
                 custom_imports, s = par.parse(new_index)
                 s = s.splitlines()
                 name = s[0][2:]

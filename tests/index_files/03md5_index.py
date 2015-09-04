@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # md5_index
 # Md5Index
 
@@ -25,7 +24,7 @@ class Md5Index(HashIndex):
         super(Md5Index, self).__init__(*args, **kwargs)
 
     def make_key_value(self, data):
-        return md5(data['name']).hexdigest(), {}
+        return md5(data['name'].encode()).hexdigest(), {}
 
     def make_key(self, key):
         return md5(key).hexdigest()
