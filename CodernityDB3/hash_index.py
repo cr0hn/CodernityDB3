@@ -552,7 +552,7 @@ class IU_HashIndex(Index):
                                  name + "_stor"), os.path.join(self.db_path, self.name + "_stor"))
         # self.name = original_name
         self.open_index()  # reload...
-        self.name = original_name.decode()
+        self.name = original_name
         self._save_params(dict(name=original_name))
         self._fix_params()
         self._clear_cache()

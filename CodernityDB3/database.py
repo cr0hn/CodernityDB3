@@ -440,7 +440,9 @@ class Database(object):
         except KeyError:
             # when opening / initializing DB without `id` index
             # happens mostly on server side
-            raise IndexError("Can't set main storage index. 'id' index name not found")
+            pass
+            # why this line?
+            # raise IndexError("Can't set main storage index. 'id' index name not found")
 
     def initialize(self, path=None, makedir=True):
         """

@@ -153,7 +153,7 @@ class WithRun_Index(HashIndex):
         vals = []
         while True:
             try:
-                d = gen.next()
+                d = next(gen)
             except StopIteration:
                 break
             else:
@@ -185,7 +185,7 @@ class WithRunEdit_Index(HashIndex):
         vals = []
         while True:
             try:
-                d = gen.next()
+                d = next(gen)
             except StopIteration:
                 break
             else:
@@ -942,7 +942,7 @@ class DB_Tests:
     def test_get_error(self, tmpdir):
         db = self._db(os.path.join(str(tmpdir), 'db'))
         db.create()
-        _id = md5('test').hexdigest()
+        _id = md5('test'.encode()).hexdigest()
         with pytest.raises(RecordNotFound):
             db.get('id', _id)
         db.insert(dict(_id=_id, test='test'))
