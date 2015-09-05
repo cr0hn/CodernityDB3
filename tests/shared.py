@@ -227,7 +227,7 @@ class TreeMultiTest(MultiTreeBasedIndex):
         return out, dict(name=name)
 
     def make_key(self, key):
-        return key.rjust(16, '_').lower()
+        return key.rjust(16, b'_').lower()
 
 
 class DB_Tests:
@@ -988,8 +988,8 @@ class DB_Tests:
             db.insert(dict(w=word))
         assert db.count(db.all, 'words') == 3245
         assert db.get('words', 'Coder')['name'] == 'Codernity'
-        assert db.get('words', "dern")['name'] == "Codernity"
-        assert db.get('words', 'Codernity')['name'] == "Codernity"
+        assert db.get('words', 'dern')['name'] == 'Codernity'
+        assert db.get('words', 'Codernity')['name'] == 'Codernity'
 
         u = db.get('words', 'Codernit', with_doc=True)
         doc = u['doc']
@@ -1011,7 +1011,7 @@ class DB_Tests:
                 super(IndentedMd5Index, self).__init__(*args, **kwargs)
 
             def make_key_value(self, data):
-                return md5(data['name']).digest(), None
+                return md5(data['name'].encode()).digest(), None
 
             def make_key(self, key):
                 return md5(key).digest()

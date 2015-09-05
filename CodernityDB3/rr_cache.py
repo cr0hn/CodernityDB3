@@ -25,8 +25,8 @@ def cache1lvl(maxsize=100):
 
         @functools.wraps(user_function)
         def wrapper(key, *args, **kwargs):
-            if isinstance(key, bytes):
-                key = key.decode()
+            # if isinstance(key, bytes):
+            #     key = key.decode()
             # print("cachedddd", key) ## TODO
             try:
                 #result = cache1lvl[key]
@@ -44,8 +44,8 @@ def cache1lvl(maxsize=100):
                 result = cache1lvl[key]
                 ## print("result caching", result) # TODO
 #               result = user_function(obj, key, *args, **kwargs)
-            if isinstance(result, bytes):
-                result = key.decode()
+            # if isinstance(result, bytes):
+            #     result = key.decode()
             ## print("r" * 20, result) # TODO
             return result
 
@@ -53,8 +53,8 @@ def cache1lvl(maxsize=100):
             cache1lvl.clear()
 
         def delete(key):
-            if isinstance(key, bytes):
-                key = key.decode()
+            # if isinstance(key, bytes):
+            #     key = key.decode()
             try:
                 del cache1lvl[key]
                 return True

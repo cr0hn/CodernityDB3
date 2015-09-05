@@ -148,7 +148,7 @@ class HashIndexTests:
             ins.append(doc)
             self.counter['ins'] += 1
 
-        for i in range(inserts / 10):
+        for i in range(inserts // 10):
             curr = ins.pop(random.randint(0, len(ins) - 1))
             db.delete(curr)
 
@@ -160,7 +160,7 @@ class HashIndexTests:
             ins.append(doc)
             self.counter['ins'] += 1
 
-        for i in range(inserts / 10):
+        for i in range(inserts // 10):
             curr = ins.pop(random.randint(0, len(ins) - 1))
             db.delete(curr)
 
@@ -211,7 +211,7 @@ class HashIndexTests:
             ins.append(doc)
             self.counter['ins'] += 1
 
-        for i in range(inserts / 10):
+        for i in range(inserts // 10):
             curr = ins.pop(random.randint(0, len(ins) - 1))
             d = {"_id": curr['_id'], '_rev': curr['_rev']}
             db.delete(d)
@@ -224,7 +224,7 @@ class HashIndexTests:
             ins.append(doc)
             self.counter['ins'] += 1
 
-        for i in range(inserts / 10):
+        for i in range(inserts // 10):
             curr = ins.pop(random.randint(0, len(ins) - 1))
             db.delete(curr)
 
@@ -251,7 +251,7 @@ class HashIndexTests:
             assert 0 == db.count(
                 db.get_many, 'custom', key=1, limit=inserts + 1)
 
-            sample = random.sample(ins, inserts / 10)
+            sample = random.sample(ins, inserts // 10)
             for curr in sample:
                 curr['test'] = 10
                 db.update(curr)
@@ -610,7 +610,7 @@ class HashIndexTests:
             db.update(d)
         _check()
 
-        num = inserts / 10
+        num = inserts // 10
         num = num if num < 20 else 20
 
         to_update = random.sample(inserted.values(), num)
