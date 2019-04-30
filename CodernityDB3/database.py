@@ -15,8 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import print_function
+import six
 import os
 import io
+import codecs
 from inspect import getsource
 
 # for custom indexes
@@ -46,6 +50,7 @@ from random import randrange
 
 import warnings
 import collections
+import codecs
 
 
 def header_for_indexes(index_name, index_class, db_custom="", ind_custom="", classes_code=""):
@@ -177,12 +182,12 @@ class Database(object):
         for curr in cls_code:
             classes_code += getsource(curr) + '\n\n'
         with io.FileIO(os.path.join(p, "%.2d%s" % (i, index.name) + '.py'), 'w') as f:
-            f.write(str.encode(header_for_indexes(index.name,
+            f.write(header_for_indexes(index.name,
                                        index.__class__.__name__,
                                        getattr(self, 'custom_header', ''),
                                        getattr(index, 'custom_header', ''),
-                                       classes_code)))
-            f.write(str.encode(code))
+                                       classes_code).encode())
+            f.write(code.encode())
         return True
 
     def _read_index_single(self, p, ind, ind_kwargs={}):
@@ -233,7 +238,7 @@ class Database(object):
                 name = s[0][2:]
                 c = s[1][2:]
                 comented = ['\n\n#SIMPLIFIED CODE']
-                list(map(lambda x: comented.append("#" + x), new_index.splitlines()))
+                list([comented.append("#" + x) for x in new_index.splitlines()])
                 comented.append('#SIMPLIFIED CODE END\n\n')
 
                 s = header_for_indexes(
@@ -263,7 +268,7 @@ class Database(object):
             if os.path.exists(ind_path_f):
                 os.rename(ind_path_f, ind_path_f + '_last')  # save last working index code
             with io.FileIO(ind_path_f, 'w') as f:
-                f.write(bytes(new_index, 'utf-8'))
+                f.write(codecs.encode(new_index, 'utf-8'))
 
             ind_obj = self._read_index_single(p, ind_path + '.py')
 
@@ -745,8 +750,8 @@ you should check index code.""" % (index.name, ex), RuntimeWarning)
         key, value = index_data
         try:
             index.delete(doc_id, key)
-        except TryReindexException:
-            print("Error in _single_delete_index")
+        except TryReindexException as exc:
+            print("Error in _single_delete_index: %r" % exc)
             return
 
     def _delete_id_index(self, _id, _rev, data):
@@ -776,7 +781,7 @@ you should check index code.""" % (index.name, ex), RuntimeWarning)
         :param index: the index to destroy
         :type index: :py:class:`CodernityDB3.index.Index`` instance, or string
         """
-        if isinstance(index, str):
+        if isinstance(index, six.string_types):
             if not index in self.indexes_names:
                 raise PreconditionsException("No index named %s" % index)
             index = self.indexes_names[index]
@@ -802,7 +807,7 @@ you should check index code.""" % (index.name, ex), RuntimeWarning)
         :param index: the index to destroy
         :type index: :py:class:`CodernityDB3.index.Index`` instance, or string
         """
-        if isinstance(index, str):
+        if isinstance(index, six.string_types):
             if not index in self.indexes_names:
                 raise PreconditionsException("No index named %s" % index)
             index = self.indexes_names[index]
@@ -839,7 +844,7 @@ you should check index code.""" % (index.name, ex), RuntimeWarning)
         :param index: the index to reindex
         :type index: :py:class:`CodernityDB3.index.Index`` instance, or string
         """
-        if isinstance(index, str):
+        if isinstance(index, six.string_types):
             if not index in self.indexes_names:
                 raise PreconditionsException("No index named %s" % index)
             index = self.indexes_names[index]
@@ -916,7 +921,7 @@ you should check index code.""" % (index.name, ex), RuntimeWarning)
             raise PreconditionsException("Can't update without _rev or _id")
         _rev = data['_rev']
         try:
-            # _rev = bytes(_rev)
+            # _rev = codecs.encode(_rev)
             pass
         except:
             self.__not_opened()
@@ -940,9 +945,8 @@ you should check index code.""" % (index.name, ex), RuntimeWarning)
         """
         # if not self.indexes_names.has_key(index_name):
         #     raise DatabaseException, "Invalid index name"
-
-        if isinstance(key, str):
-            key = bytes(key, 'utf-8')
+        if isinstance(key, six.text_type):
+            key = codecs.encode(key, 'utf-8')
         try:
             ind = self.indexes_names[index_name]
         except KeyError:
