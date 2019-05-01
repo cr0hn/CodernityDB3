@@ -16,10 +16,12 @@
 # limitations under the License.
 
 
+from __future__ import absolute_import
 import re
 import tokenize
 import token
 import uuid
+from six.moves import range
 
 
 class IndexCreatorException(Exception):
@@ -182,6 +184,7 @@ class Parser(object):
         def is_string(s):
             m = re.search('\s*(?P<a>[\'\"]+).*?(?P=a)\s*', s)
             return m
+
         data = re.split('make_key_value\:', data)
 
         if len(data) < 2:
