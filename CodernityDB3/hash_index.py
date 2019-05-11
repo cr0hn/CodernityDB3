@@ -163,7 +163,7 @@ class IU_HashIndex(Index):
 
         :param key: the key to find
         """
-        print('_find_key %r' % key)
+        # print('_find_key %r' % key)
         # Fix types
         if isinstance(key, six.text_type):
             key = key.encode()
@@ -830,6 +830,8 @@ class IU_UniqueHashIndex(IU_HashIndex):
                 if status != b'd' and status != 'd':
                     if isinstance(rev, six.binary_type):
                         rev = rev.decode()
+                    if isinstance(doc_id, six.binary_type):
+                        doc_id = doc_id.decode()
                     yield doc_id, rev, start, size, status
                     limit -= 1
 
