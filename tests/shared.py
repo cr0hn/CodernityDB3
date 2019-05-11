@@ -27,6 +27,7 @@ from CodernityDB3.debug_stuff import database_step_by_step
 
 from CodernityDB3 import rr_cache
 
+import six
 import pytest
 import os
 import random
@@ -111,12 +112,16 @@ class WithAIndex(HashIndex):
     def make_key_value(self, data):
         a_val = data.get("a")
         if a_val is not None:
+            if isinstance(a_val, int):
+                a_val = str(a_val)
             if not isinstance(a_val, bytes):
                 a_val = bytes(a_val, 'utf-8')
             return md5(a_val).digest(), None
         return None
 
     def make_key(self, key):
+        if isinstance(key, int):
+            key = str(key)
         if not isinstance(key, bytes):
             key = bytes(key, 'utf-8')
         return md5(key).digest()
@@ -307,7 +312,8 @@ class DB_Tests:
         db2 = self._db(p)
         db.create()
 
-    '''def test_real_life_example_random(self, tmpdir, operations):
+    '''
+    def test_real_life_example_random(self, tmpdir, operations):
 
         db = self._db(os.path.join(str(tmpdir), 'db'))
         db.set_indexes([UniqueHashIndex(db.path, 'id'),
@@ -538,7 +544,7 @@ class DB_Tests:
             db.destroy_index(index_name)
 
             assert not file_exists_in_indexes_dir(index_name)
-            print(file_exists_in_indexes_dir(index_name))
+            # print(file_exists_in_indexes_dir(index_name))
             with pytest.raises(IndexNotFoundException):
                 db.get_index_details(index_name)
 #        with instance
@@ -553,7 +559,7 @@ class DB_Tests:
             db.destroy_index(index_to_destory)
 
             assert not file_exists_in_indexes_dir(index_name)
-            print(file_exists_in_indexes_dir(index_name))
+            # print(file_exists_in_indexes_dir(index_name))
             with pytest.raises(IndexNotFoundException):
                 db.get_index_details(index_name)
 
@@ -572,7 +578,7 @@ class DB_Tests:
                 db.destroy_index(klass(db.path, klass.__name__))
 
             assert file_exists_in_indexes_dir(index_name)
-            print(file_exists_in_indexes_dir(index_name))
+            # print(file_exists_in_indexes_dir(index_name))
             assert db.get_index_details(index_name)
 
     def test_removing_index_from_db_2(self, tmpdir):

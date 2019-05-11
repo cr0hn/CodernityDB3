@@ -17,6 +17,8 @@
 
 from CodernityDB3.database import RecordDeleted, RecordNotFound
 
+from CodernityDB3.index import TryReindexException 
+ 
 from CodernityDB3.hash_index import UniqueHashIndex
 
 from CodernityDB3.tree_index import TreeBasedIndex
@@ -80,11 +82,8 @@ class EvenCapacityTreeIndex(TreeBasedIndex):
         return key
 
 
-def sort_by_key(list):
-
-    def _comp(a, b):
-        return cmp(a['a'], b['a'])
-    list.sort(_comp)
+def sort_by_key(lst):
+    lst.sort(key=lambda i: i['a'])
 
 
 def check_if_keys_match(gen, list):
@@ -107,7 +106,7 @@ class TreeIndexTests:
             return True
 
         def _update():
-            vals = inserted.values()
+            vals = list(inserted.values())
             if not vals:
                 return False
             doc = random.choice(vals)
@@ -122,7 +121,7 @@ class TreeIndexTests:
             return True
 
         def _delete():
-            vals = inserted.values()
+            vals = list(inserted.values())
             if not vals:
                 return False
             doc = random.choice(vals)
@@ -135,14 +134,14 @@ class TreeIndexTests:
             return True
 
         def _get():
-            vals = inserted.values()
+            vals = list(inserted.values())
             if not vals:
                 return False
             doc = random.choice(vals)
             got = db.get('tree', doc['a'])
             assert got['key'] == doc['a']
             return True
-
+        
         if with_get:
             fcts = (_insert,) * 20 + (_get,) * 10 + (_update,
                                                      ) * 10 + (_delete,) * 5
@@ -184,7 +183,7 @@ class TreeIndexTests:
         tree = SimpleTreeIndex(db.path, 'tree')
         db.set_indexes([id, tree])
         db.create()
-        key_values = range(3)
+        key_values = list(range(3))
         for i in range(3):
             a = dict(a=key_values.pop())
             db.insert(a)
@@ -198,7 +197,7 @@ class TreeIndexTests:
         tree = SimpleTreeIndex(db.path, 'tree')
         db.set_indexes([id, tree])
         db.create()
-        key_values = range(6)
+        key_values = list(range(6))
         for i in range(6):
             a = dict(a=key_values.pop())
             db.insert(a)
@@ -282,7 +281,7 @@ class TreeIndexTests:
         tree = SimpleTreeIndex(db.path, 'tree')
         db.set_indexes([id, tree])
         db.create()
-        key_values = range(9)
+        key_values = list(range(9))
         for i in range(len(key_values)):
             a = dict(a=key_values[i])
             db.insert(a)
@@ -623,7 +622,7 @@ class TreeIndexTests:
             test = db.get('tree', a['a'])
             assert test['key'] == a['a']
         assert db.count(db.get_many, 'tree', 20, limit=-1) == len(
-            filter(lambda k: k == 20, key_values))
+            list(filter(lambda k: k == 20, key_values)))
         db.close()
 
     def test_get_all_smaller(self, tmpdir):
@@ -639,7 +638,7 @@ class TreeIndexTests:
             test = db.get('tree', a['a'])
             assert test['key'] == a['a']
         assert db.count(db.get_many, 'tree', limit=-1, end=20,
-                        inclusive_end=False) == len(filter(lambda k: k < 20, key_values))
+                        inclusive_end=False) == len(list(filter(lambda k: k < 20, key_values)))
         db.close()
 
     def test_get_all_smaller_inclusive(self, tmpdir):
@@ -655,7 +654,7 @@ class TreeIndexTests:
             test = db.get('tree', a['a'])
             assert test['key'] == a['a']
         assert db.count(db.get_many, 'tree', limit=-1,
-                        end=20) == len(filter(lambda k: k <= 20, key_values))
+                        end=20) == len(list(filter(lambda k: k <= 20, key_values)))
         db.close()
 
     def test_get_all_bigger(self, tmpdir):
@@ -670,7 +669,7 @@ class TreeIndexTests:
             db.insert(a)
             test = db.get('tree', a['a'])
             assert test['key'] == a['a']
-        assert db.count(db.get_many, 'tree', limit=-1, start=20, inclusive_start=False) == len(filter(lambda k: k > 20, key_values))
+        assert db.count(db.get_many, 'tree', limit=-1, start=20, inclusive_start=False) == len(list(filter(lambda k: k > 20, key_values)))
         db.close()
 
     def test_get_all_bigger_inclusive(self, tmpdir):
@@ -686,7 +685,7 @@ class TreeIndexTests:
             test = db.get('tree', a['a'])
             assert test['key'] == a['a']
         assert db.count(db.get_many, 'tree', limit=-1,
-                        start=20) == len(filter(lambda k: k >= 20, key_values))
+                        start=20) == len(list(filter(lambda k: k >= 20, key_values)))
         db.close()
 
     def test_get_all_between(self, tmpdir):
@@ -707,7 +706,7 @@ class TreeIndexTests:
                         start=4,
                         end=22,
                         inclusive_start=False,
-                        inclusive_end=False) == len(filter(lambda k: k < 22 and k > 4, key_values))
+                        inclusive_end=False) == len(list(filter(lambda k: k < 22 and k > 4, key_values)))
         db.close()
 
     def test_get_all_between_not_existing_keys(self, tmpdir):
@@ -728,7 +727,7 @@ class TreeIndexTests:
                         start=3,
                         end=19,
                         inclusive_start=False,
-                        inclusive_end=False) == len(filter(lambda k: k < 19 and k > 3, key_values))
+                        inclusive_end=False) == len(list(filter(lambda k: k < 19 and k > 3, key_values)))
         db.close()
 
     def test_get_all_between_not_existing_keys_inclusive(self, tmpdir):
@@ -744,7 +743,7 @@ class TreeIndexTests:
             test = db.get('tree', a['a'])
             assert test['key'] == a['a']
         assert db.count(db.get_many, 'tree', limit=-1, start=3,
-                        end=19) == len(filter(lambda k: k < 19 and k > 3, key_values))
+                        end=19) == len(list(filter(lambda k: k < 19 and k > 3, key_values)))
         db.close()
 
     def test_get_all_between_inclusive(self, tmpdir):
@@ -760,7 +759,7 @@ class TreeIndexTests:
             test = db.get('tree', a['a'])
             assert test['key'] == a['a']
         assert db.count(db.get_many, 'tree', limit=-1, start=13,
-                        end=20) == len(filter(lambda k: k <= 20 and k >= 13, key_values))
+                        end=20) == len(list(filter(lambda k: k <= 20 and k >= 13, key_values)))
         db.close()
 
     def test_get_all(self, tmpdir):
@@ -883,7 +882,7 @@ class TreeIndexTests:
         def count_and_check(inserted):
             assert len(inserted) == db.count(db.all, 'tree')
             assert len(inserted) == db.count(db.all, 'custom_tree')
-            inserted_vals = inserted.values()
+            inserted_vals = list(inserted.values())
             sort_by_key(inserted_vals)
             assert check_if_keys_match(
                 db.all('tree', with_storage=False), inserted_vals)
@@ -912,7 +911,7 @@ class TreeIndexTests:
 
         def count_and_check(inserted):
             assert len(inserted) == db.count(db.all, 'tree')
-            inserted_vals = inserted.values()
+            inserted_vals = list(inserted.values())
             sort_by_key(inserted_vals)
             assert check_if_keys_match(
                 db.all('tree', with_storage=False), inserted_vals)
@@ -940,8 +939,8 @@ class TreeIndexTests:
         updated = {}
 
         def count_and_check(all_smaller, end_key):
-            assert len(
-                all_smaller) == db.count(db.get_many, 'tree', limit=-1, end=end_key,
+            all_smaller = list(all_smaller)
+            assert len(all_smaller) == db.count(db.get_many, 'tree', limit=-1, end=end_key,
                                          inclusive_end=False)
             sort_by_key(all_smaller)
             all_smaller.reverse()
@@ -952,8 +951,8 @@ class TreeIndexTests:
             assert check_if_keys_match(result, all_smaller)
 
         self.random_database_usage(db, 1000, inserted, updated, with_get=False)
-        end_key = random.choice(inserted.values())['a']
-        all_smaller = filter(lambda k: k['a'] < end_key, inserted.values())
+        end_key = random.choice(list(inserted.values()))['a']
+        all_smaller = filter(lambda k: k['a'] < end_key, list(inserted.values()))
 
         count_and_check(all_smaller, end_key)
 
@@ -971,6 +970,7 @@ class TreeIndexTests:
         updated = {}
 
         def count_and_check(all_smaller_equal, end_key):
+            all_smaller_equal = list(all_smaller_equal)
             assert len(all_smaller_equal) == db.count(
                 db.get_many, 'tree', limit=-1, end=end_key)
             sort_by_key(all_smaller_equal)
@@ -981,9 +981,9 @@ class TreeIndexTests:
             assert check_if_keys_match(result, all_smaller_equal)
 
         self.random_database_usage(db, 1000, inserted, updated, with_get=False)
-        end_key = random.choice(inserted.values())['a']
+        end_key = random.choice(list(inserted.values()))['a']
         all_smaller_equal = filter(
-            lambda k: k['a'] <= end_key, inserted.values())
+            lambda k: k['a'] <= end_key, list(inserted.values()))
 
         count_and_check(all_smaller_equal, end_key)
         db.close()
@@ -1000,8 +1000,8 @@ class TreeIndexTests:
         updated = {}
 
         def count_and_check(all_bigger, start_key):
-            assert len(
-                all_bigger) == db.count(db.get_many, 'tree', limit=-1, start=start_key,
+            all_bigger = list(all_bigger)
+            assert len(all_bigger) == db.count(db.get_many, 'tree', limit=-1, start=start_key,
                                         inclusive_start=False)
             sort_by_key(all_bigger)
             result = db.get_many('tree', limit=-1,
@@ -1011,8 +1011,8 @@ class TreeIndexTests:
             assert check_if_keys_match(result, all_bigger)
 
         self.random_database_usage(db, 1000, inserted, updated, with_get=False)
-        start_key = random.choice(inserted.values())['a']
-        all_bigger = filter(lambda k: k['a'] > start_key, inserted.values())
+        start_key = random.choice(list(inserted.values()))['a']
+        all_bigger = filter(lambda k: k['a'] > start_key, list(inserted.values()))
 
         count_and_check(all_bigger, start_key)
         db.close()
@@ -1029,6 +1029,7 @@ class TreeIndexTests:
         updated = {}
 
         def count_and_check(all_bigger_equal, start_key):
+            all_bigger_equal = list(all_bigger_equal)
             assert len(all_bigger_equal) == db.count(
                 db.get_many, 'tree', limit=-1, start=start_key)
             sort_by_key(all_bigger_equal)
@@ -1038,9 +1039,9 @@ class TreeIndexTests:
             assert check_if_keys_match(result, all_bigger_equal)
 
         self.random_database_usage(db, 1000, inserted, updated, with_get=False)
-        start_key = random.choice(inserted.values())['a']
+        start_key = random.choice(list(inserted.values()))['a']
         all_bigger_equal = filter(
-            lambda k: k['a'] >= start_key, inserted.values())
+            lambda k: k['a'] >= start_key, list(inserted.values()))
 
         count_and_check(all_bigger_equal, start_key)
         db.close()
@@ -1057,6 +1058,7 @@ class TreeIndexTests:
         updated = {}
 
         def count_and_check(all_between, start_key, end_key):
+            all_between = list(all_between)
             assert len(all_between) == db.count(db.get_many, 'tree', limit=-1,
                                                 start=start_key, end=end_key,
                                                 inclusive_start=False, inclusive_end=False)
@@ -1068,15 +1070,15 @@ class TreeIndexTests:
             assert check_if_keys_match(result, all_between)
 
         self.random_database_usage(db, 1000, inserted, updated, with_get=False)
-        start_key = random.choice(inserted.values())['a']
-        end_key = random.choice(inserted.values())['a']
+        start_key = random.choice(list(inserted.values()))['a']
+        end_key = random.choice(list(inserted.values()))['a']
         if start_key > end_key:
             tmp = start_key
             start_key = end_key
             end_key = tmp
 
         all_between = filter(lambda k: k['a'] > start_key and k[
-            'a'] < end_key, inserted.values())
+            'a'] < end_key, list(inserted.values()))
 
         count_and_check(all_between, start_key, end_key)
         db.close()
@@ -1110,6 +1112,7 @@ class TreeIndexTests:
         updated = {}
 
         def count_and_check(all_between, start_key, end_key):
+            all_between = list(all_between)
             offset = random.randint(5, 20)
             count = len(all_between) - offset
             if count == 0:
@@ -1121,15 +1124,15 @@ class TreeIndexTests:
                     inclusive_start=False, inclusive_end=False)
 
         self.random_database_usage(db, 1000, inserted, updated, with_get=False)
-        start_key = random.choice(inserted.values())['a']
-        end_key = random.choice(inserted.values())['a']
+        start_key = random.choice(list(inserted.values()))['a']
+        end_key = random.choice(list(inserted.values()))['a']
         if start_key > end_key:
             tmp = start_key
             start_key = end_key
             end_key = tmp
 
         all_between = filter(lambda k: k['a'] > start_key and k[
-            'a'] < end_key, inserted.values())
+            'a'] < end_key, list(inserted.values()))
 
         count_and_check(all_between, start_key, end_key)
         db.close()
@@ -1146,9 +1149,9 @@ class TreeIndexTests:
         updated = {}
 
         def count_and_check(all_between_inclusive, start_key, end_key):
-            assert len(
-                all_between_inclusive) == db.count(db.get_many, 'tree', limit=-1,
-                                                   start=start_key, end=end_key)
+            all_between_inclusive = list(all_between_inclusive)
+            assert len(all_between_inclusive) == db.count(db.get_many, 'tree', limit=-1,
+                                                                start=start_key, end=end_key)
             sort_by_key(all_between_inclusive)
             result = db.get_many('tree', limit=-1,
                                  start=start_key, end=end_key,
@@ -1156,15 +1159,15 @@ class TreeIndexTests:
             assert check_if_keys_match(result, all_between_inclusive)
 
         self.random_database_usage(db, 1000, inserted, updated, with_get=False)
-        start_key = random.choice(inserted.values())['a']
-        end_key = random.choice(inserted.values())['a']
+        start_key = random.choice(list(inserted.values()))['a']
+        end_key = random.choice(list(inserted.values()))['a']
         if start_key > end_key:
             tmp = start_key
             start_key = end_key
             end_key = tmp
 
         all_between_inclusive = filter(lambda k: k['a'] >= start_key and k[
-            'a'] <= end_key, inserted.values())
+            'a'] <= end_key, list(inserted.values()))
 
         count_and_check(all_between_inclusive, start_key, end_key)
         db.close()
@@ -1181,8 +1184,8 @@ class TreeIndexTests:
         updated = {}
 
         def count_and_check(all_between_start_inclusive, start_key, end_key):
-            assert len(
-                all_between_start_inclusive) == db.count(db.get_many, 'tree', limit=-1,
+            all_between_start_inclusive = list(all_between_start_inclusive)
+            assert len(all_between_start_inclusive) == db.count(db.get_many, 'tree', limit=-1,
                                                          start=start_key, end=end_key,
                                                          inclusive_end=False)
             sort_by_key(all_between_start_inclusive)
@@ -1192,14 +1195,14 @@ class TreeIndexTests:
             assert check_if_keys_match(result, all_between_start_inclusive)
 
         self.random_database_usage(db, 1000, inserted, updated, with_get=False)
-        start_key = random.choice(inserted.values())['a']
-        end_key = random.choice(inserted.values())['a']
+        start_key = random.choice(list(inserted.values()))['a']
+        end_key = random.choice(list(inserted.values()))['a']
         if start_key > end_key:
             tmp = start_key
             start_key = end_key
             end_key = tmp
         all_between_start_inclusive = filter(lambda k: k['a']
-                                             >= start_key and k['a'] < end_key, inserted.values())
+                                             >= start_key and k['a'] < end_key, list(inserted.values()))
         count_and_check(all_between_start_inclusive, start_key, end_key)
         db.close()
 
@@ -1215,10 +1218,10 @@ class TreeIndexTests:
         updated = {}
 
         def count_and_check(all_between_end_inclusive, start_key, end_key):
-            assert len(
-                all_between_end_inclusive) == db.count(db.get_many, 'tree', limit=-1,
-                                                       start=start_key, end=end_key,
-                                                       inclusive_start=False, with_storage=False)
+            all_between_end_inclusive = list(all_between_end_inclusive)
+            assert len(all_between_end_inclusive) == db.count(db.get_many, 'tree', limit=-1,
+                                                                    start=start_key, end=end_key,
+                                                                    inclusive_start=False, with_storage=False)
             sort_by_key(all_between_end_inclusive)
             result = db.get_many('tree', limit=-1,
                                  start=start_key, end=end_key,
@@ -1226,15 +1229,15 @@ class TreeIndexTests:
             assert check_if_keys_match(result, all_between_end_inclusive)
 
         self.random_database_usage(db, 1000, inserted, updated, with_get=False)
-        start_key = random.choice(inserted.values())['a']
-        end_key = random.choice(inserted.values())['a']
+        start_key = random.choice(list(inserted.values()))['a']
+        end_key = random.choice(list(inserted.values()))['a']
         if start_key > end_key:
             tmp = start_key
             start_key = end_key
             end_key = tmp
 
         all_between_end_inclusive = filter(lambda k: k['a'] >
-                                           start_key and k['a'] <= end_key, inserted.values())
+                                           start_key and k['a'] <= end_key, list(inserted.values()))
 
         count_and_check(all_between_end_inclusive, start_key, end_key)
         db.close()
@@ -1250,7 +1253,7 @@ class TreeIndexTests:
 
         def count_and_check(inserted):
             assert len(inserted) == db.count(db.all, 'tree')
-            inserted_vals = inserted.values()
+            inserted_vals = list(inserted.values())
             sort_by_key(inserted_vals)
             assert check_if_keys_match(
                 db.all('tree', with_storage=False), inserted_vals)
@@ -1320,26 +1323,26 @@ class TreeIndexTests:
                 db.get_many, 'tree', start_key, offset=offset)
 
         self.random_database_usage(db, 1000, inserted, updated, with_get=False)
-        start_key = random.choice(inserted.values())['a']
-        end_key = random.choice(inserted.values())['a']
+        start_key = random.choice(list(inserted.values()))['a']
+        end_key = random.choice(list(inserted.values()))['a']
         if start_key > end_key:
             tmp = start_key
             start_key = end_key
             end_key = tmp
 
         lists = [len(inserted)]  # all
-        lists.append(len(filter(lambda k: k['a'] > start_key and k[
-            'a'] < end_key, inserted.values())))  # all_between
-        lists.append(len(filter(lambda k: k['a'] < end_key,
-                                inserted.values())))  # all_smaller
-        lists.append(len(filter(lambda k: k['a'] <= end_key,
-                                inserted.values())))  # all_smaller_equal
-        lists.append(len(filter(lambda k: k['a'] > start_key,
-                                inserted.values())))  # all_bigger
-        lists.append(len(filter(lambda k: k['a'] >= start_key,
-                                inserted.values())))  # all_bigger_equal
-        lists.append(len(filter(lambda k: k['a'] == start_key,
-                                inserted.values())))  # many start key
+        lists.append(len(list(filter(lambda k: k['a'] > start_key and k[
+            'a'] < end_key, list(inserted.values())))))  # all_between
+        lists.append(len(list(filter(lambda k: k['a'] < end_key,
+                                list(inserted.values())))))  # all_smaller
+        lists.append(len(list(filter(lambda k: k['a'] <= end_key,
+                                list(inserted.values())))))  # all_smaller_equal
+        lists.append(len(list(filter(lambda k: k['a'] > start_key,
+                                list(inserted.values())))))  # all_bigger
+        lists.append(len(list(filter(lambda k: k['a'] >= start_key,
+                                list(inserted.values())))))  # all_bigger_equal
+        lists.append(len(list(filter(lambda k: k['a'] == start_key,
+                                list(inserted.values())))))  # many start key
 
         count_and_check(lists, start_key, end_key)
         db.close()
