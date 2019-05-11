@@ -25,7 +25,7 @@ def pytest_addoption(parser):
 
 
 def pytest_generate_tests(metafunc):
-     if "inserts" in metafunc.funcargnames:
-         metafunc.parametrize("inserts", [metafunc.config.option.inserts, ])
-     if "operations" in metafunc.funcargnames:
-         metafunc.parametrize("operations", [metafunc.config.option.operations, ])
+    if "inserts" in metafunc.funcargnames:
+        metafunc.parametrize("inserts", [metafunc.config.option.inserts, ])
+    if "operations" in metafunc.funcargnames:
+        metafunc.parametrize("operations", [metafunc.config.option.operations, ])
