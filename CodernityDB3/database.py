@@ -750,7 +750,7 @@ for ID index. You should update that index \
         try:
             index.delete(doc_id, key)
         except TryReindexException as exc:
-            print("Error in _single_delete_index: %r" % exc)
+            # print("Error in _single_delete_index: %r" % exc)
             return
 
     def _delete_id_index(self, _id, _rev, data):

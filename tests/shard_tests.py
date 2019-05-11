@@ -71,7 +71,7 @@ class ShardTests:
         n = globals()['ShardedUniqueHashIndex%d' % sh_nums]
         db.add_index(n(db.path, 'id'))
         l = []
-        for x in range(10000):
+        for x in range(100):
             l.append(db.insert(dict(x=x))['_id'])
 
         for curr in l:

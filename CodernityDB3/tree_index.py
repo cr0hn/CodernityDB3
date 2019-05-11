@@ -1757,7 +1757,7 @@ class IU_TreeBasedIndex(Index):
             if next_leaf:
                 nr_of_elements = self._read_leaf_nr_of_elements(next_leaf)
             else:
-                print("_read_leaf_nr_of_elements failed doc_id=%r  key=%r" % (doc_id, key))
+                # print("_read_leaf_nr_of_elements failed doc_id=%r  key=%r" % (doc_id, key))
                 raise TryReindexException()
             try:
                 leaf_start, record_index, doc_id, l_key, start, size, status = self._find_key_in_leaf_for_update(key,
@@ -1765,7 +1765,7 @@ class IU_TreeBasedIndex(Index):
                                                                                                                  next_leaf,
                                                                                                                  nr_of_elements)
             except ElemNotFound:
-                print("_find_key_in_leaf_for_update failed doc_id=%r  key=%r" % (doc_id, key))
+                # print("_find_key_in_leaf_for_update failed doc_id=%r  key=%r" % (doc_id, key))
                 raise TryReindexException()
         return leaf_start, record_index, doc_id, l_key, start, size, status
 

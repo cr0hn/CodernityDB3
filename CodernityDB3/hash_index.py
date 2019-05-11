@@ -853,8 +853,8 @@ class IU_UniqueHashIndex(IU_HashIndex):
         except:
             raise IndexPreconditionsException(
                 "_id must be valid string/bytes object")
-        if len(_id) != 32:
-            raise IndexPreconditionsException("Invalid _id lenght")
+        if not isinstance(_id, bytes) or len(_id) != 32:
+            raise IndexPreconditionsException("Invalid _id type or lenght")
         del data['_id']
         del data['_rev']
         return _id, data
