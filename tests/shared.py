@@ -27,6 +27,7 @@ from CodernityDB3.debug_stuff import database_step_by_step
 
 from CodernityDB3 import rr_cache
 
+import six
 import pytest
 import os
 import random
@@ -111,12 +112,16 @@ class WithAIndex(HashIndex):
     def make_key_value(self, data):
         a_val = data.get("a")
         if a_val is not None:
+            if isinstance(a_val, int):
+                a_val = str(a_val)
             if not isinstance(a_val, bytes):
                 a_val = bytes(a_val, 'utf-8')
             return md5(a_val).digest(), None
         return None
 
     def make_key(self, key):
+        if isinstance(key, int):
+            key = str(key)
         if not isinstance(key, bytes):
             key = bytes(key, 'utf-8')
         return md5(key).digest()

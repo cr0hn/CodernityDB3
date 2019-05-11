@@ -18,15 +18,14 @@
 
 def pytest_addoption(parser):
     parser.addoption("--inserts", type="int",
-                     help="how many inserts", default=2000)
+                     help="how many inserts", default=20)
 
     parser.addoption("--operations", type="int",
-                     help="how many operations", default=5000)
+                     help="how many operations", default=50)
 
 
 def pytest_generate_tests(metafunc):
-    if "inserts" in metafunc.funcargnames:
-        metafunc.addcall(funcargs=dict(inserts=metafunc.config.option.inserts))
-    if "operations" in metafunc.funcargnames:
-        metafunc.addcall(funcargs=dict(operations=metafunc.config.
-                                       option.operations))
+     if "inserts" in metafunc.funcargnames:
+         metafunc.parametrize("inserts", [metafunc.config.option.inserts, ])
+     if "operations" in metafunc.funcargnames:
+         metafunc.parametrize("operations", [metafunc.config.option.operations, ])

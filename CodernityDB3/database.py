@@ -831,8 +831,8 @@ you should check index code.""" % (index.name, ex), RuntimeWarning)
     def _single_reindex_index(self, index, data):
         doc_id, rev, start, size, status = self.id_ind.get(
             data['_id'])  # it's cached so it's ok
-        print(status)
-        if status != b'd' and status != b'u':
+        # print(status)
+        if status != b'd' and status != b'u' and status != 'd' and status != 'u':
             self._single_insert_index(index, data, doc_id)
 
     def reindex_index(self, index):
@@ -959,13 +959,12 @@ you should check index code.""" % (index.name, ex), RuntimeWarning)
             raise RecordNotFound(ex)
         if not start and not size:
             raise RecordNotFound("Not found")
-        elif status == b'd':
+        elif status == b'd' or status == 'd':
             raise RecordDeleted("Deleted")
         if with_storage and size:
             storage = ind.storage
             data = storage.get(start, size, status)
         else:
-
             data = {}
         if with_doc and index_name != 'id':
             storage = ind.storage
@@ -1013,7 +1012,6 @@ you should check index code.""" % (index.name, ex), RuntimeWarning)
             gen = ind.get_between(start, end, limit, offset, **kwargs)
         while True:
             try:
-#                l_key, start, size, status = gen.next()
                 ind_data = next(gen)
             except StopIteration:
                 break

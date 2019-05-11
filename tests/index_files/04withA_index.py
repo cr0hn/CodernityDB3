@@ -26,6 +26,8 @@ class WithAIndex(HashIndex):
     def make_key_value(self, data):
         a_val = data.get("a")
         if a_val:
+            if isinstance(a_val, int):
+                a_val = str(a_val)
             # unnecessary code?
             # if not isinstance(a_val, bytes):
             #     a_val = bytes(a_val, 'utf-8')
