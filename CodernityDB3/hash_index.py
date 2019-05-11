@@ -163,6 +163,7 @@ class IU_HashIndex(Index):
 
         :param key: the key to find
         """
+        print('_find_key %r' % key)
         # Fix types
         if isinstance(key, six.text_type):
             key = key.encode()
@@ -511,6 +512,7 @@ class IU_HashIndex(Index):
         else:
             # case happens when trying to delete element with new index key in data
             # after adding new index to database without reindex
+            # print("failed to delete doc_id=%r  key=%r" % (doc_id, key))
             raise TryReindexException()
         found_at, _doc_id, _key, start, size, status, _next = self._locate_doc_id(doc_id, key, location)
         self.buckets.seek(found_at)

@@ -638,16 +638,14 @@ for ID index. You should update that index \
         try:
             old_should_index = index.make_key_value(db_data)
         except Exception as ex:
-            warnings.warn("""Problem during update for `%s`, ex = `%s`, \
-uou should check index code.""" % (index.name, ex), RuntimeWarning)
+            warnings.warn("""Problem during update for `%s`, ex = `%s`, you should check index code.""" % (index.name, ex), RuntimeWarning)
             old_should_index = None
         if old_should_index:
             old_key, old_value = old_should_index
             try:
                 new_should_index = index.make_key_value(data)
             except Exception as ex:
-                warnings.warn("""Problem during update for `%s`, ex = `%r`, \
-you should check index code.""" % (index.name, ex), RuntimeWarning)
+                warnings.warn("""Problem during update for `%s`, ex = `%r`, you should check index code.""" % (index.name, ex), RuntimeWarning)
                 new_should_index = None
             if new_should_index:
                 new_key, new_value = new_should_index
@@ -671,6 +669,7 @@ you should check index code.""" % (index.name, ex), RuntimeWarning)
         Performs update on **id** index
         """
         _id, value = self.id_ind.make_key_value(data)
+        # print('_update_id_index', _id, value)
         db_data = self.get('id', _id)
         if db_data['_rev'] != _rev:
             raise RevConflict()
@@ -686,6 +685,7 @@ you should check index code.""" % (index.name, ex), RuntimeWarning)
         Performs update operation on all indexes in order
         """
         _id, new_rev, db_data = self._update_id_index(_rev, data)
+        # print('_update_indexes', _id, new_rev)
         for index in self.indexes[1:]:
             self._single_update_index(index, data, db_data, _id)
         return _id, new_rev
@@ -701,8 +701,7 @@ you should check index code.""" % (index.name, ex), RuntimeWarning)
         try:
             should_index = index.make_key_value(data)
         except Exception as ex:
-            warnings.warn("""Problem during insert for `%s`, ex = `%r`, \
-you should check index code.""" % (index.name, ex), RuntimeWarning)
+            warnings.warn("""Problem during insert for `%s`, ex = `%r`, you should check index code.""" % (index.name, ex), RuntimeWarning)
             should_index = None
         if should_index:
             key, value = should_index
@@ -928,6 +927,10 @@ you should check index code.""" % (index.name, ex), RuntimeWarning)
             raise PreconditionsException(
                 "`_rev` must be valid bytes object")
         _id, new_rev = self._update_indexes(_rev, data)
+        if isinstance(_id, six.binary_type):
+            _id = _id.decode()
+        if isinstance(new_rev, six.binary_type):
+            new_rev = new_rev.decode()
         ret = {'_id': _id, '_rev': new_rev}
         data.update(ret)
         return ret

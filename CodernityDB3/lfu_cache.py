@@ -99,11 +99,11 @@ def cache2lvl(maxsize=100):
 
         @functools.wraps(user_function)
         def wrapper(*args, **kwargs):
+#            return user_function(*args, **kwargs)
             key = args[0]
             # print('cache2lvl.wrapper %r' % key)
             if isinstance(key, six.text_type):
                 key = key.encode()            
-#            return user_function(*args, **kwargs)
             try:
                 result = cache[key][args[1]]
             except KeyError:

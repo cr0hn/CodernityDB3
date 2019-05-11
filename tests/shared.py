@@ -312,7 +312,8 @@ class DB_Tests:
         db2 = self._db(p)
         db.create()
 
-    '''def test_real_life_example_random(self, tmpdir, operations):
+    '''
+    def test_real_life_example_random(self, tmpdir, operations):
 
         db = self._db(os.path.join(str(tmpdir), 'db'))
         db.set_indexes([UniqueHashIndex(db.path, 'id'),
