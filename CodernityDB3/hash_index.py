@@ -32,6 +32,7 @@ import io
 import struct
 import shutil
 import codecs
+import hashlib
 
 from CodernityDB3.storage import IU_Storage, DummyStorage
 
@@ -228,10 +229,12 @@ class IU_HashIndex(Index):
 
     def _calculate_position(self, key):
         # Fix types
+        if isinstance(key, int):
+            key = str(key)
         if isinstance(key, six.text_type):
             key = key.encode()
-
-        return abs(hash(key) & self.hash_lim) * self.bucket_line_size + self._start_ind
+        # return abs(hash(key) & self.hash_lim) * self.bucket_line_size + self._start_ind
+        return abs(int(hashlib.md5(key).hexdigest(), 16) & self.hash_lim) * self.bucket_line_size + self._start_ind
 
     # TODO add cache!
     def _locate_key(self, key, start):
